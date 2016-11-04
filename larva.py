@@ -78,15 +78,6 @@ class Larva:
 
     # Function dispatch table:
     state_fcns = {LarvaState.CRAWL_FWD: crawl_fwd,
-                  LarvaState.WV_CRAWL_FWD: wv_crawl_fwd,
-                  LarvaState.WV_CRAWL_FWD_WHILE_CAST: wv_crawl_fwd_while_cast,
-                  LarvaState.WV_CHANGE_CAST_DIR: wv_change_cast_dir,
-                  LarvaState.CAST_START: cast_start,
-                  LarvaState.CAST_TURN: cast_turn,
-                  LarvaState.CAST_TURN_AFTER_MIN_ANGLE: cast_turn_after_min_angle,
-                  LarvaState.CAST_TURN_TO_MIDDLE: cast_turn_to_middle,
-                  LarvaState.CAST_TURN_RANDOM_DIR: cast_turn_random_dir}
-    state_fcns = {LarvaState.CRAWL_FWD: crawl_fwd,
                   LarvaState.WV_CRAWL_FWD: wv,
                   LarvaState.WV_CRAWL_FWD_WHILE_CAST: wv,
                   LarvaState.WV_CHANGE_CAST_DIR: wv,
