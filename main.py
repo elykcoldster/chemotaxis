@@ -1,5 +1,8 @@
+from model import Model
+import model
 def main():
-    # TODO: create model singleton object
+    # Create global model singleton object
+    model.modelInstance = Model()
     # TODO: create controller object and run    
 
 if __name__ == "__main__":

@@ -13,3 +13,6 @@ class Model:
             l.update() # TODO: pass probabilities as arguments to larva's update
         # TODO: update the three probabilities
         time = time + 1
+
+# Global Model singleton (uninitialized)
+modelInstance = None;
