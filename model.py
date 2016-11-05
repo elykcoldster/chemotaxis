@@ -9,7 +9,9 @@ class Model:
         reference to the singleton Model. Never call the constructor
         explicitly.
         """
+        # TODO: provide methods to set these to different values later
         self.time = 0
+        self.dt = 0.1
         self.larvae = []
         # TODO: add other model objects and params (arena, etc)
     
@@ -25,6 +27,5 @@ class Model:
     def update(self):
         """Increment the time and tell all objects to update themselves"""
         for l in larvae:
-            l.update() # TODO: pass probabilities as arguments to larva's update
-        # TODO: update the three probabilities
+            l.update()
         time = time + 1
