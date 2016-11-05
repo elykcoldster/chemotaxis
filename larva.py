@@ -1,6 +1,6 @@
 from enum import Enum
 import random as rn
-import model
+from model import Model as m
 class Larva:
     class LarvaState(Enum):
         # Crawl states
@@ -19,7 +19,7 @@ class Larva:
 
     def crawl_fwd(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: CRAWL FWD')
-        if model.modelInstance.time - self.cur_run_time > self.t_min_run:
+        if m.get_instance().time - self.cur_run_time > self.t_min_run:
             self.state = LarvaState.WV_CRAWL_FWD
 
     def wv(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
@@ -103,7 +103,7 @@ class Larva:
         self.theta_max = theta_max
         self.theta_min = theta_min
         self.cast_speed = cast_speed
-        self.cast_epsilon = cast_speed * model.modelInstance.dt / 0.5;
+        self.cast_epsilon = cast_speed * m.get_instance().dt / 0.5;
         self.wv_theta_max = wv_theta_max
         self.v_fwd = v_fwd
         self.t_min_run = t_min_run
