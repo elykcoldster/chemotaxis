@@ -1,6 +1,10 @@
+from controller import Controller
+
+
 def main():
     # TODO: create controller object and run
-    pass
+    controller = Controller()
+    controller.run()
 
 if __name__ == "__main__":
     main()

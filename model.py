@@ -30,6 +30,6 @@ class Model:
 
     def update(self):
         """Increment the time and tell all objects to update themselves"""
-        for l in larvae:
+        for l in self.larvae:
             l.update()
         time = time + dt

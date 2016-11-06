@@ -34,8 +34,10 @@ class Larva:
         return m.get_instance().dt * r
 
     def p_wv():
+        pass
 
     def p_wv_cast_resume():
+        pass
 
     def perceive():
         h2s = self.head_loc - m.get_instance().source_position
@@ -189,11 +191,12 @@ class Larva:
         # init perceptual history array
         self.history = []
         # init larva state (crawl forward)
-        self.state = LarvaState.CRAWL_FWD
+        self.state = Larva.LarvaState.CRAWL_FWD
 
     def update(self):
         """Update larva state based on transition probabilities
         """
+        print('Updating a larva')
         # Generate a random number for probabilistic events
         rand = rn.random()  # TODO: seed random in main function instead of here
         # Perceive the surrounding world and calculate probabilities here:
@@ -249,4 +252,4 @@ class Larva:
         """
         head_vec = self.head_loc - self.joint_loc # joint is origin
         cos_theta = np.dot(head_vec, self.velocity) / (np.linalg.norm(head_vec) * np.linalg.norm(self.velocity))
-        return = math.degrees(math.acos(cos_theta))
+        return math.degrees(math.acos(cos_theta))
