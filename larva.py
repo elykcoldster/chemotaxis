@@ -35,14 +35,13 @@ class Larva:
 
     def perceive():
         return 0.0
+
     def crawl_fwd(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: CRAWL FWD')
         if m.get_instance().time - self.cur_run_time > self.t_min_run:
             self.state = LarvaState.WV_CRAWL_FWD
         else:
-            distance = m.get_instance().dt * self.cast_speed  # TODO: set dt in Model
-            self.head_loc = self.head_loc + distance * self.velocity
-            self.joint_loc = self.joint_loc + distance * self.velocity
+            self.move_forward()
 
     def wv(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: WEATHERVANE PSEUDO-STATE')
@@ -61,12 +60,19 @@ class Larva:
 
     def wv_crawl_fwd(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: WV CRAWL FWD')
+        self.move_forward()
         if rand < p_wv_cast_resume:
+            # Pick a random cast direction? (need to confirm that this is the right thing to do)
+            self.cast_dir = np.sign(rand - 0.5)
             self.state = LarvaState.WV_CRAWL_FWD_WHILE_CAST
 
     def wv_crawl_fwd_while_cast(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: WV CRAWL FWD WHILE CAST')
+        self.rotate_weathervane_cast()
+        self.move_forward()
         if rand < p_wv:
+            # When weathervaning stops, the velocity is updated
+            self.update_velocity()
             self.state = LarvaState.WV_CRAWL_FWD
         else:
             if self.get_head_angle() > self.wv_theta_max:
@@ -74,6 +80,7 @@ class Larva:
 
     def wv_change_cast_dir(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: WV CHANGE CAST DIR')
+        self.cast_dir *= -1
         self.state = LarvaState.WV_CRAWL_FWD_WHILE_CAST
 
     def cast_start(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
@@ -100,6 +107,8 @@ class Larva:
         print ('State: CAST TURN AFTER MIN ANGLE')
         self.rotate_normal_cast()
         if rand < p_cast_term:
+            # Cast termination results in a new velocity vector
+            self.update_velocity()
             self.state = LarvaState.CRAWL_FWD
         else:
             if self.get_head_angle() > self.theta_max:
@@ -207,6 +216,17 @@ class Larva:
         self.head_loc = np.dot(rotation_matrix, self.head_loc)
         # Translate back to original region
         self.head_loc += self.joint_loc
+
+    def move_forward(self):
+        distance = m.get_instance().dt * self.cast_speed  # TODO: set dt in Model
+        self.head_loc = self.head_loc + distance * self.velocity
+        self.joint_loc = self.joint_loc + distance * self.velocity
+    
+    def update_velocity(self):
+        """Set velocity to be in the direction of vector from joint to head
+        """
+        new_vel = self.head_loc - self.joint_loc
+        self.velocity = new_vel / np.linalg.norm(new_vel)
 
     def get_head_angle(self):
         """Get absolute angle of head with respect to the midline (velocity vector)
