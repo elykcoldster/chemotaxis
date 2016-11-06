@@ -32,20 +32,18 @@ class Larva:
         for t in range(0,self.t_cast_term):
             r += self.history[len(self.history) - t/dt - 1] * k_cast_term[len(k_cast_term) - t/dt - 1];
         return m.get_instance().dt * r
+
     def p_wv():
 
     def p_wv_cast_resume():
 
     def perceive():
-<<<<<<< HEAD
         h2s = self.head_loc - m.get_instance().source_position
         distance = np.linalg.norm(h2s)
         strength = m.get_instance().source_strength
         sigma = m.get_instance().source_decay_rate
         return 1/np.sqrt(2*np.pi*sigma*sigma)*np.exp(-distance * distance/(2*sigma*sigma))
-=======
-        return 0.0
->>>>>>> 99b57304075dfbd3bdce1c9e3a4e27253bc8e855
+
 
     def crawl_fwd(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: CRAWL FWD')
