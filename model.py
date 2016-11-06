@@ -28,4 +28,4 @@ class Model:
         """Increment the time and tell all objects to update themselves"""
         for l in larvae:
             l.update()
-        time = time + 1
+        time = time + dt
