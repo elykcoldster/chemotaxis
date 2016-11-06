@@ -1,3 +1,5 @@
+import numpy as np
+
 class Model:
     # A reference to the singleton object
     __instance = None
@@ -12,6 +14,9 @@ class Model:
         # TODO: provide methods to set these to different values later
         self.time = 0
         self.dt = 0.1
+        self.source_position = np.array([0,0])
+        self.source_strength = 1
+        self.source_decay_rate = 1
         self.larvae = []
         # TODO: add other model objects and params (arena, etc)
     

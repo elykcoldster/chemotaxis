@@ -24,17 +24,25 @@ class Larva:
     def p_run_term():
         r = self.run_term_base
         for t in range(0,self.t_run_term):
-            r += self.history[(m.get_instance.time - t)/dt - 1] * k_run_term[len(k_run_term) - t/dt - 1];
+            r += self.history[len(self.history) - t/dt - 1] * k_run_term[len(k_run_term) - t/dt - 1];
         return m.get_instance().dt * r
 
     def p_cast_term():
-
+        r = self.cast_term_base
+        for t in range(0,self.t_cast_term):
+            r += self.history[len(self.history) - t/dt - 1] * k_cast_term[len(k_cast_term) - t/dt - 1];
+        return m.get_instance().dt * r
     def p_wv():
 
     def p_wv_cast_resume():
 
     def perceive():
-        return 0.0
+        h2s = self.head_loc - m.get_instance().source_position
+        distance = np.linalg.norm(h2s)
+        strength = m.get_instance().source_strength
+        sigma = m.get_instance().source_decay_rate
+        return 1/np.sqrt(2*np.pi*sigma*sigma)*np.exp(-distance * distance/(2*sigma*sigma))
+
     def crawl_fwd(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: CRAWL FWD')
         if m.get_instance().time - self.cur_run_time > self.t_min_run:
@@ -128,7 +136,7 @@ class Larva:
                   LarvaState.CAST_TURN_TO_MIDDLE: cast_turn_to_middle,
                   LarvaState.CAST_TURN_RANDOM_DIR: cast_turn_random_dir}
 
-    def __init__(self, location, velocity, head_length=1, theta_max=120.0, theta_min=37, cast_speed=240, wv_theta_max=20, wv_cast_speed=60, v_fwd=1.0, t_min_run=7, run_term_base=0.148, cast_term_base=2, wv_term_base=2, wv_cast_resume=1):
+    def __init__(self, location, velocity, head_length=1, theta_max=120.0, theta_min=37, cast_speed=240, wv_theta_max=20, wv_cast_speed=60, v_fwd=1.0, t_min_run=7, run_term_base=0.148, cast_term_base=2, wv_term_base=2, wv_cast_resume=1, t_run_term=20, t_cast_term=1):
         """Larva ctor
 
         Args:
@@ -162,8 +170,15 @@ class Larva:
         self.cast_term_base = cast_term_base
         self.wv_term_base = wv_term_base
         self.wv_cast_resume = wv_cast_resume
-
-        self.history = [] # perceptual history, unbounded size for now
+        # run termination time and kernel
+        self.t_run_term = t_run_term
+        self.k_run_term = np.arange(1, -1, m.get_instance().dt/t_run_term)
+        # cast termination time and kernel
+        self.t_cast_term = t_cast_term
+        self.k_cast_term = np.arange(0, 150, m.get_instance().dt/t_cast_term) # may need piecewise kernel later
+        # init perceptual history array
+        self.history = []
+        # init larva state (crawl forward)
         self.state = LarvaState.CRAWL_FWD
 
     def update(self):
