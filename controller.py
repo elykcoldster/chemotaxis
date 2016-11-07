@@ -7,7 +7,7 @@ from larva import Larva
 class Controller:
     def run(self):
         while True:
-            input_str = input('Time: ' + str(m.get_instance().time) + ', Enter command: ')
+            input_str = input('Time: {0:.1f}, Enter command: '.format(m.get_instance().time))
             inputs = deque(input_str.split())
             cmd = inputs.popleft()
             if cmd == 'q':

@@ -21,25 +21,25 @@ class Larva:
         CAST_TURN_TO_MIDDLE = 8
         CAST_TURN_RANDOM_DIR = 9
 
-    def p_run_term():
+    def p_run_term(self):
         r = self.run_term_base
         for t in range(0,self.t_run_term):
             r += self.history[len(self.history) - t/dt - 1] * k_run_term[len(k_run_term) - t/dt - 1];
         return m.get_instance().dt * r
 
-    def p_cast_term():
+    def p_cast_term(self):
         r = self.cast_term_base
         for t in range(0,self.t_cast_term):
             r += self.history[len(self.history) - t/dt - 1] * k_cast_term[len(k_cast_term) - t/dt - 1];
         return m.get_instance().dt * r
 
-    def p_wv():
+    def p_wv(self):
         pass
 
-    def p_wv_cast_resume():
+    def p_wv_cast_resume(self):
         pass
 
-    def perceive():
+    def perceive(self):
         h2s = self.head_loc - m.get_instance().source_position
         distance = np.linalg.norm(h2s)
         strength = m.get_instance().source_strength
@@ -47,54 +47,54 @@ class Larva:
         return 1/np.sqrt(2*np.pi*sigma*sigma)*np.exp(-distance * distance/(2*sigma*sigma))
 
 
-    def crawl_fwd(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
+    def crawl_fwd(self, p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: CRAWL FWD')
-        if m.get_instance().time - self.cur_run_time > self.t_min_run:
-            self.state = LarvaState.WV_CRAWL_FWD
+        if m.get_instance().time - self.run_start_time > self.t_min_run:
+            self.state = Larva.LarvaState.WV_CRAWL_FWD
         else:
             self.move_forward()
 
-    def wv(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
+    def wv(self, p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: WEATHERVANE PSEUDO-STATE')
-        if self.state == LarvaState.WV_CRAWL_FWD:
-            wv_crawl_fwd(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand)
-        elif self.state == LarvaState.WV_CRAWL_FWD_WHILE_CAST:
-            wv_crawl_fwd_while_cast(
+        if self.state == Larva.LarvaState.WV_CRAWL_FWD:
+            self.wv_crawl_fwd(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand)
+        elif self.state == Larva.LarvaState.WV_CRAWL_FWD_WHILE_CAST:
+            self.wv_crawl_fwd_while_cast(
                 p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand)
-        elif self.state == LarvaState.WV_CHANGE_CAST_DIR:
-            wv_change_cast_dir(p_run_term, p_cast_term,
+        elif self.state == Larva.LarvaState.WV_CHANGE_CAST_DIR:
+            self.wv_change_cast_dir(p_run_term, p_cast_term,
                                p_wv, p_wv_cast_resume, rand)
         if rand < p_run_term:
             # Note: If we terminate a run while in the middle of weathervane casting, we DO NOT
             # modify the velocity to point in the direction of the weathervane cast
-            self.state = LarvaState.CAST_START
+            self.state = Larva.LarvaState.CAST_START
 
-    def wv_crawl_fwd(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
+    def wv_crawl_fwd(self, p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: WV CRAWL FWD')
         self.move_forward()
         if rand < p_wv_cast_resume:
             # Pick a random cast direction? (need to confirm that this is the right thing to do)
             self.cast_dir = np.sign(rand - 0.5)
-            self.state = LarvaState.WV_CRAWL_FWD_WHILE_CAST
+            self.state = Larva.LarvaState.WV_CRAWL_FWD_WHILE_CAST
 
-    def wv_crawl_fwd_while_cast(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
+    def wv_crawl_fwd_while_cast(self, p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: WV CRAWL FWD WHILE CAST')
         self.rotate_weathervane_cast()
         self.move_forward()
         if rand < p_wv:
             # When weathervaning stops, the velocity is updated
             self.update_velocity()
-            self.state = LarvaState.WV_CRAWL_FWD
+            self.state = Larva.LarvaState.WV_CRAWL_FWD
         else:
             if self.get_head_angle() > self.wv_theta_max:
-                self.state = LarvaState.WV_CHANGE_CAST_DIR
+                self.state = Larva.LarvaState.WV_CHANGE_CAST_DIR
 
-    def wv_change_cast_dir(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
+    def wv_change_cast_dir(self, p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: WV CHANGE CAST DIR')
         self.cast_dir *= -1
-        self.state = LarvaState.WV_CRAWL_FWD_WHILE_CAST
+        self.state = Larva.LarvaState.WV_CRAWL_FWD_WHILE_CAST
 
-    def cast_start(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
+    def cast_start(self, p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: CAST START')
         # Set cast direction in this state
         # If current head location is left of midline, turn direction is counter-clockwise (positive)
@@ -104,49 +104,50 @@ class Larva:
         # Turn direction determined by this determinant:
         # | velocity.x   velocity.y |
         # | head.x       head.y     |
-        mat = np.array([self.velocity, self.translated_head])
+        mat = np.array([self.velocity, translated_head])
         self.cast_dir = np.sign(np.linalg.det(mat))
-        self.state = LarvaState.CAST_TURN
+        self.state = Larva.LarvaState.CAST_TURN
 
-    def cast_turn(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
+    def cast_turn(self, p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: CAST TURN')
         self.rotate_normal_cast()
         if self.get_head_angle() > self.theta_min:
-            self.state = LarvaState.CAST_TURN_AFTER_MIN_ANGLE
+            self.state = Larva.LarvaState.CAST_TURN_AFTER_MIN_ANGLE
 
-    def cast_turn_after_min_angle(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
+    def cast_turn_after_min_angle(self, p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: CAST TURN AFTER MIN ANGLE')
         self.rotate_normal_cast()
         if rand < p_cast_term:
             # Cast termination results in a new velocity vector
             self.update_velocity()
-            self.state = LarvaState.CRAWL_FWD
+            self.run_start_time = m.get_instance().time
+            self.state = Larva.LarvaState.CRAWL_FWD
         else:
             if self.get_head_angle() > self.theta_max:
                 self.cast_dir *= -1
-                self.state = LarvaState.CAST_TURN_TO_MIDDLE
+                self.state = Larva.LarvaState.CAST_TURN_TO_MIDDLE
 
-    def cast_turn_to_middle(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
+    def cast_turn_to_middle(self, p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: CAST TURN TO MIDDLE')
         self.rotate_normal_cast()
         if abs(self.get_head_angle()) < self.cast_epsilon:
-            self.state = LarvaState.CAST_TURN_RANDOM_DIR
+            self.state = Larva.LarvaState.CAST_TURN_RANDOM_DIR
 
-    def cast_turn_random_dir(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
+    def cast_turn_random_dir(self, p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
         print ('State: CAST TURN RANDOM DIR')
         self.cast_dir = np.sign(rand - 0.5)
-        self.state = LarvaState.CAST_TURN
+        self.state = Larva.LarvaState.CAST_TURN
 
     # Function dispatch table:
-    state_fcns = {LarvaState.CRAWL_FWD: crawl_fwd,
-                  LarvaState.WV_CRAWL_FWD: wv,
-                  LarvaState.WV_CRAWL_FWD_WHILE_CAST: wv,
-                  LarvaState.WV_CHANGE_CAST_DIR: wv,
-                  LarvaState.CAST_START: cast_start,
-                  LarvaState.CAST_TURN: cast_turn,
-                  LarvaState.CAST_TURN_AFTER_MIN_ANGLE: cast_turn_after_min_angle,
-                  LarvaState.CAST_TURN_TO_MIDDLE: cast_turn_to_middle,
-                  LarvaState.CAST_TURN_RANDOM_DIR: cast_turn_random_dir}
+    state_fcns = {LarvaState.CRAWL_FWD: 'crawl_fwd',
+                  LarvaState.WV_CRAWL_FWD: 'wv',
+                  LarvaState.WV_CRAWL_FWD_WHILE_CAST: 'wv',
+                  LarvaState.WV_CHANGE_CAST_DIR: 'wv',
+                  LarvaState.CAST_START: 'cast_start',
+                  LarvaState.CAST_TURN: 'cast_turn',
+                  LarvaState.CAST_TURN_AFTER_MIN_ANGLE: 'cast_turn_after_min_angle',
+                  LarvaState.CAST_TURN_TO_MIDDLE: 'cast_turn_to_middle',
+                  LarvaState.CAST_TURN_RANDOM_DIR: 'cast_turn_random_dir'}
 
     def __init__(self, location, velocity, head_length=1, theta_max=120.0, theta_min=37, cast_speed=240, wv_theta_max=20, wv_cast_speed=60, v_fwd=1.0, t_min_run=7, run_term_base=0.148, cast_term_base=2, wv_term_base=2, wv_cast_resume=1, t_run_term=20, t_cast_term=1):
         """Larva ctor
@@ -191,6 +192,7 @@ class Larva:
         # init perceptual history array
         self.history = []
         # init larva state (crawl forward)
+        self.run_start_time = m.get_instance().time
         self.state = Larva.LarvaState.CRAWL_FWD
 
     def update(self):
@@ -205,11 +207,12 @@ class Larva:
         p_wv = rn.random()
         p_wv_cast_resume = rn.random()
 
-        self.history.append(perceive())
+        self.history.append(self.perceive())
 
-        fcn = state_fcns.get(self.state)
-        if not fcn:
+        fcn_name = self.state_fcns.get(self.state)
+        if not fcn_name:
             raise ValueError("Not a valid Larva State!")
+        fcn = getattr(self, fcn_name)
         fcn(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand)
 
     def rotate_normal_cast(self):
@@ -252,4 +255,6 @@ class Larva:
         """
         head_vec = self.head_loc - self.joint_loc # joint is origin
         cos_theta = np.dot(head_vec, self.velocity) / (np.linalg.norm(head_vec) * np.linalg.norm(self.velocity))
+        # We have to clamp the cosine angle because of rounding errors (an issue when the two vectors point in the same direction)
+        cos_theta = min(1.0, max(cos_theta, -1.0))
         return math.degrees(math.acos(cos_theta))

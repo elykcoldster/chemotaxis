@@ -11,6 +11,7 @@ class Model:
         reference to the singleton Model. Never call the constructor
         explicitly.
         """
+        print("Creating Model singleton")
         self.time = 0
         self.dt = dt
         self.source_position = source_position
@@ -32,4 +33,4 @@ class Model:
         """Increment the time and tell all objects to update themselves"""
         for l in self.larvae:
             l.update()
-        time = time + dt
+        self.time += self.dt
