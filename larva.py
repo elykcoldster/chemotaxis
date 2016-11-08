@@ -23,14 +23,36 @@ class Larva:
 
     def p_run_term(self):
         r = self.run_term_base
-        for t in range(0,self.t_run_term):
-            r += self.history[len(self.history) - t/dt - 1] * k_run_term[len(k_run_term) - t/dt - 1];
+        dt = m.get_instance().dt
+        if len(self.history) > 1:
+            term_time = np.minimum(len(self.history) * dt, self.t_run_term)
+            for t in np.arange(0,term_time,dt):
+                tsteps = int(t/dt)
+                C = self.history[len(self.history) - tsteps - 1]
+                C_prev = self.history[len(self.history) - tsteps - 2]
+
+                phi = 0
+                if len(self.history) - tsteps - 2 >= 0:
+                    phi = 1/C*((C-C_prev)/dt)
+                kernel = self.k_run_term[len(self.k_run_term) - tsteps - 1]
+                r += phi * kernel
+        print(r)
         return m.get_instance().dt * r
 
     def p_cast_term(self):
         r = self.cast_term_base
-        for t in range(0,self.t_cast_term):
-            r += self.history[len(self.history) - t/dt - 1] * k_cast_term[len(k_cast_term) - t/dt - 1];
+        dt = m.get_instance().dt
+        if len(self.history) > 1:
+            for t in arange(0,self.t_cast_term,dt):
+                tsteps = int(t/dt)
+
+                C = self.history[len(self.history) - tsteps - 1]
+                C_prev = self.history[len(self.history) - tsteps - 2]
+
+                phi = 1/C*((C-C_prev)/dt)
+                kernel = self.k_cast_term[len(self.k_cast_term) - tsteps - 1]
+
+                r += phi * kernel
         return m.get_instance().dt * r
 
     def p_wv(self):
@@ -44,7 +66,7 @@ class Larva:
         distance = np.linalg.norm(h2s)
         strength = m.get_instance().source_strength
         sigma = m.get_instance().source_decay_rate
-        return 1/np.sqrt(2*np.pi*sigma*sigma)*np.exp(-distance * distance/(2*sigma*sigma))
+        return strength*1/np.sqrt(2*np.pi*sigma*sigma)*np.exp(-distance * distance/(2*sigma*sigma))
 
 
     def crawl_fwd(self, p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
@@ -185,7 +207,7 @@ class Larva:
         self.wv_cast_resume = wv_cast_resume
         # run termination time and kernel
         self.t_run_term = t_run_term
-        self.k_run_term = np.arange(1, -1, m.get_instance().dt/t_run_term)
+        self.k_run_term = np.arange(1, -1, -m.get_instance().dt/t_run_term)
         # cast termination time and kernel
         self.t_cast_term = t_cast_term
         self.k_cast_term = np.arange(0, 150, m.get_instance().dt/t_cast_term) # may need piecewise kernel later
@@ -202,7 +224,7 @@ class Larva:
         # Generate a random number for probabilistic events
         rand = rn.random()  # TODO: seed random in main function instead of here
         # Perceive the surrounding world and calculate probabilities here:
-        p_run_term = rn.random()
+        p_run_term = self.p_run_term()
         p_cast_term = rn.random()
         p_wv = rn.random()
         p_wv_cast_resume = rn.random()

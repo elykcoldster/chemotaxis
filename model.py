@@ -21,7 +21,7 @@ class Model:
         # TODO: add other model objects and params (arena, etc)
     
     @staticmethod
-    def get_instance(dt=0.1, source_position=np.array([0,0]), source_strength=1, source_decay_rate=1):
+    def get_instance(dt=0.1, source_position=np.array([0,0]), source_strength=10, source_decay_rate=5):
         if not Model.__instance:
             Model.__instance = Model(dt, source_position, source_strength, source_decay_rate)
         return Model.__instance
