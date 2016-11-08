@@ -33,25 +33,25 @@ class Larva:
 
                 phi = 0
                 if len(self.history) - tsteps - 2 >= 0:
-                    phi = 1/C*((C-C_prev)/dt)
+                    phi = (np.log(C)-np.log(C_prev))/dt
                 kernel = self.k_run_term[len(self.k_run_term) - tsteps - 1]
                 r += phi * kernel
-        print(r)
         return m.get_instance().dt * r
 
     def p_cast_term(self):
         r = self.cast_term_base
         dt = m.get_instance().dt
         if len(self.history) > 1:
-            for t in arange(0,self.t_cast_term,dt):
+            term_time = np.minimum(len(self.history) * dt, self.t_run_term)
+            for t in arange(0,term_time,dt):
                 tsteps = int(t/dt)
-
                 C = self.history[len(self.history) - tsteps - 1]
                 C_prev = self.history[len(self.history) - tsteps - 2]
 
-                phi = 1/C*((C-C_prev)/dt)
+                phi = 0
+                if len(self.history) - tsteps - 2 >= 0:
+                    phi = (np.log(C)-np.log(C_prev))/dt
                 kernel = self.k_cast_term[len(self.k_cast_term) - tsteps - 1]
-
                 r += phi * kernel
         return m.get_instance().dt * r
 
@@ -262,7 +262,7 @@ class Larva:
         self.head_loc += self.joint_loc
 
     def move_forward(self):
-        distance = m.get_instance().dt * self.cast_speed  # TODO: set dt in Model
+        distance = m.get_instance().dt * self.v_fwd  # TODO: set dt in Model
         self.head_loc = self.head_loc + distance * self.velocity
         self.joint_loc = self.joint_loc + distance * self.velocity
     
