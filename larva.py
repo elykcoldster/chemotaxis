@@ -213,6 +213,8 @@ class Larva:
         self.k_cast_term = np.arange(0, 150, m.get_instance().dt/t_cast_term) # may need piecewise kernel later
         # init perceptual history array
         self.history = []
+        # init larva path
+        self.path = []
         # init larva state (crawl forward)
         self.run_start_time = m.get_instance().time
         self.state = Larva.LarvaState.CRAWL_FWD
@@ -230,6 +232,7 @@ class Larva:
         p_wv_cast_resume = rn.random()
 
         self.history.append(self.perceive())
+        self.path.append(np.concatenate((self.head_loc, self.joint_loc)))
 
         fcn_name = self.state_fcns.get(self.state)
         if not fcn_name:

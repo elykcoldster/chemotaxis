@@ -1,4 +1,4 @@
-import pdb
+#import pdb
 from controller import Controller
 
 
@@ -8,5 +8,5 @@ def main():
     controller.run()
 
 if __name__ == "__main__":
-    pdb.set_trace()
+    #pdb.set_trace()
     main()
