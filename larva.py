@@ -43,7 +43,7 @@ class Larva:
         dt = m.get_instance().dt
         if len(self.history) > 1:
             term_time = np.minimum(len(self.history) * dt, self.t_run_term)
-            for t in arange(0,term_time,dt):
+            for t in np.arange(0,term_time,dt):
                 tsteps = int(t/dt)
                 C = self.history[len(self.history) - tsteps - 1]
                 C_prev = self.history[len(self.history) - tsteps - 2]
@@ -227,7 +227,7 @@ class Larva:
         rand = rn.random()  # TODO: seed random in main function instead of here
         # Perceive the surrounding world and calculate probabilities here:
         p_run_term = self.p_run_term()
-        p_cast_term = rn.random()
+        p_cast_term = self.p_cast_term()
         p_wv = rn.random()
         p_wv_cast_resume = rn.random()
 
