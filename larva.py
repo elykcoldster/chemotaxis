@@ -57,13 +57,11 @@ class Larva:
 
     def p_wv(self):
 
-        # some values hard coded here. will make them params in the constructor for larva soon
-
         p_wv = self.wv_term_base
-        t_wv_long_avg = 10
-        t_wv_short_avg = 1
+        t_wv_long_avg = self.t_wv_long_avg
+        t_wv_short_avg = self.t_wv_short_avg
+        k_wv_mult = self.k_wv_mult
 
-        k_wv_mult = 30
         dt = m.get_instance().dt
         if len(self.history) > 1:
             term_time = np.minimum(len(self.history) * dt, t_wv_short_avg + t_wv_long_avg)
@@ -81,13 +79,13 @@ class Larva:
                 # assuming multiplicative factor of -30 in range [t_short_avg, t_short_avg+t_long_avg]
                 # all these kernels don't make sense in a few cases because the probabilities
                 # might go below 0 or above 1 in certain cases
-                kernel = 30 if t <= t_wv_short_avg else -30
+                kernel = k_wv_mult if t <= t_wv_short_avg else -1*k_wv_mult
                 p_wv += kernel*phi
 
         return m.get_instance().dt * p_wv
 
     def p_wv_cast_resume(self):
-        r_wv_cast_resume = 1
+        r_wv_cast_resume = self.r_wv_cast_resume
         return m.get_instance().dt * r_wv_cast_resume
 
     def perceive(self):
@@ -200,7 +198,7 @@ class Larva:
                   LarvaState.CAST_TURN_TO_MIDDLE: 'cast_turn_to_middle',
                   LarvaState.CAST_TURN_RANDOM_DIR: 'cast_turn_random_dir'}
 
-    def __init__(self, location, velocity, head_length=1, theta_max=120.0, theta_min=37, cast_speed=240, wv_theta_max=20, wv_cast_speed=60, v_fwd=1.0, t_min_run=7, run_term_base=0.148, cast_term_base=2, wv_term_base=2, wv_cast_resume=1, t_run_term=20, t_cast_term=1):
+    def __init__(self, location, velocity, head_length=1, theta_max=120.0, theta_min=37, cast_speed=240, wv_theta_max=20, wv_cast_speed=60, v_fwd=1.0, t_min_run=7, run_term_base=0.148, cast_term_base=2, wv_term_base=2, wv_cast_resume=1, t_run_term=20, t_cast_term=1, r_wv_cast_resume = 1, t_wv_long_avg = 10, t_wv_short_avg = 1, k_wv_mult = 30):
         """Larva ctor
 
         Args:
@@ -240,13 +238,19 @@ class Larva:
         # cast termination time and kernel
         self.t_cast_term = t_cast_term
         self.k_cast_term = np.arange(0, 150, m.get_instance().dt/t_cast_term) # may need piecewise kernel later
-        # init perceptual history array
+        #weathervane parameters
+        self.r_wv_cast_resume = r_wv_cast_resume
+        self.t_wv_long_avg = t_wv_long_avg
+        self.t_wv_short_avg = t_wv_short_avg
+        self.k_wv_mult = k_wv_mult
+		# init perceptual history array
         self.history = []
         # init larva path
         self.path = []
         # init larva state (crawl forward)
         self.run_start_time = m.get_instance().time
         self.state = Larva.LarvaState.CRAWL_FWD
+		
 
     def update(self):
         """Update larva state based on transition probabilities
