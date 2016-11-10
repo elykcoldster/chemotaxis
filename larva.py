@@ -260,15 +260,13 @@ class Larva:
         # cast termination time and kernel
         self.t_cast_term = t_cast_term
         self.k_cast_term = np.arange(0, 150, m.get_instance().dt/t_cast_term) # may need piecewise kernel later
-        #weathervane parameters
+        # weathervane parameters
         self.r_wv_cast_resume = r_wv_cast_resume
         self.t_wv_long_avg = t_wv_long_avg
         self.t_wv_short_avg = t_wv_short_avg
         self.k_wv_mult = k_wv_mult
-		# init perceptual history array
+        # init perceptual history array
         self.history = []
-        # init larva path
-        self.path = []
         # init larva state (crawl forward)
         self.run_start_time = m.get_instance().time
         self.state = Larva.LarvaState.CRAWL_FWD
@@ -287,7 +285,6 @@ class Larva:
         p_wv_cast_resume = self.p_wv_cast_resume()
 
         self.history.append(self.perceive())
-        self.path.append(np.concatenate((self.head_loc, self.joint_loc)))
 
         fcn_name = self.state_fcns.get(self.state)
         if not fcn_name:
