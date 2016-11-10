@@ -56,10 +56,39 @@ class Larva:
         return m.get_instance().dt * r
 
     def p_wv(self):
-        pass
+
+        # some values hard coded here. will make them params in the constructor for larva soon
+
+        p_wv = self.wv_term_base
+        t_wv_long_avg = 10
+        t_wv_short_avg = 1
+
+        k_wv_mult = 30
+        dt = m.get_instance().dt
+        if len(self.history) > 1:
+            term_time = np.minimum(len(self.history) * dt, t_wv_short_avg + t_wv_long_avg)
+            for t in np.arange(0, term_time, dt):
+                tsteps = int(t/dt)
+                C = self.history[len(self.history) - tsteps - 1]
+                C_prev = self.history[len(self.history) - tsteps - 2]
+
+                phi = 0
+
+                if len(self.history) - tsteps - 2 >= 0:
+                    phi = (np.log(C) - np.log(C_prev))/dt;
+
+                # assuming multiplicative factor of 30 until we go t_short_avg steps back
+                # assuming multiplicative factor of -30 in range [t_short_avg, t_short_avg+t_long_avg]
+                # all these kernels don't make sense in a few cases because the probabilities
+                # might go below 0 or above 1 in certain cases
+                kernel = 30 if t <= t_wv_short_avg else -30
+                p_wv += kernel*phi
+
+        return m.get_instance().dt * p_wv
 
     def p_wv_cast_resume(self):
-        pass
+        r_wv_cast_resume = 1
+        return m.get_instance().dt * r_wv_cast_resume
 
     def perceive(self):
         h2s = self.head_loc - m.get_instance().source_position
@@ -228,8 +257,8 @@ class Larva:
         # Perceive the surrounding world and calculate probabilities here:
         p_run_term = self.p_run_term()
         p_cast_term = self.p_cast_term()
-        p_wv = rn.random()
-        p_wv_cast_resume = rn.random()
+        p_wv = self.p_wv()
+        p_wv_cast_resume = self.p_wv_cast_resume()
 
         self.history.append(self.perceive())
         self.path.append(np.concatenate((self.head_loc, self.joint_loc)))
