@@ -128,6 +128,8 @@ class Larva:
         # | head.x       head.y     |
         mat = np.array([self.velocity, translated_head])
         self.cast_dir = np.sign(np.linalg.det(mat))
+        if not self.cast_dir:
+            self.cast_dir = np.sign(rand - 0.5)
         self.state = Larva.LarvaState.CAST_TURN
 
     def cast_turn(self, p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
