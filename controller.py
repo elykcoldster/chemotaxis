@@ -10,7 +10,10 @@ class Controller:
         while True:
             input_str = input('Time: {0:.1f}, Enter command: '.format(m.get_instance().time))
             inputs = deque(input_str.split())
-            cmd = inputs.popleft()
+            if len(inputs) == 0:
+                cmd = ''
+            else:
+                cmd = inputs.popleft()
             if cmd == 'q':
                 print('Quiting')
                 return
@@ -34,14 +37,14 @@ class Controller:
                 for i in range(iters):
                     m.get_instance().update()
             elif cmd == 's':
-                # Run specified number of iterations, or just one if no arg given (without printing)
+                # Run specified number of iterations, or just one if no arg given (no prints)
                 iters = 0
                 if not len(inputs):
                     iters = 1
                 else:
                     iters = int(inputs.popleft())
                 for i in range(iters):
-                    m.get_instance().update()
+                    m.get_instance().update(False)
             elif cmd == 'p':
                 larvae = m.get_instance().larvae
                 for i in range(0,len(larvae)):
