@@ -20,6 +20,16 @@ class Larva:
         CAST_TURN_AFTER_MIN_ANGLE = 7
         CAST_TURN_TO_MIDDLE = 8
         CAST_TURN_RANDOM_DIR = 9
+        
+        @staticmethod
+        def is_crawling(state):
+            if (state == Larva.LarvaState.CRAWL_FWD or
+                state == Larva.LarvaState.WV_CRAWL_FWD or
+                state == Larva.LarvaState.WV_CRAWL_FWD_WHILE_CAST or
+                state == Larva.LarvaState.WV_CHANGE_CAST_DIR):
+                return True
+            return False
+
 
     def p_run_term(self):
         r = self.run_term_base
