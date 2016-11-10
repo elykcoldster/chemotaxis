@@ -7,34 +7,35 @@ LarvaState = Larva.LarvaState
 class StatsView(View):
     def __init__(self):
         self.clear()
-        # Assumes that Larvae are always started in CRAWL_FWD state
-        # Setting initial previous state to a casting state
-        self.prev_state = LarvaState.CAST_TURN_AFTER_MIN_ANGLE
+        self.prev_state = None
 
     def update_view(self, time, state, head_loc, joint_loc, velocity, head_angle):
-        if state == LarvaState.WV_CRAWL_FWD and self.prev_state == LarvaState.WV_CRAWL_FWD_WHILE_CAST:
-            # Only count a wv cast when it terminates (otherwise, it may not
-            # actually resulted in a velocity change)
-            self.count_wv_casts += 1
-        # Calculating time of a crawl:
-        if LarvaState.is_crawling(state):
-            if not LarvaState.is_crawling(self.prev_state):
-                # Starting a crawl means a cast was just terminated
-                if self.cur_cast_t:
-                    self.cast_times.append(self.cur_cast_t)
-                self.cur_crawl_t = 0
+        # If view just created, and has no previous state, don't calculate
+        # anything, wait till the next update
+        if self.prev_state:
+            if state == LarvaState.WV_CRAWL_FWD and self.prev_state == LarvaState.WV_CRAWL_FWD_WHILE_CAST:
+                # Only count a wv cast when it terminates (otherwise, it may not
+                # actually resulted in a velocity change)
+                self.count_wv_casts += 1
+            # Calculating time of a crawl:
+            if LarvaState.is_crawling(state):
+                if not LarvaState.is_crawling(self.prev_state):
+                    # Starting a crawl means a cast was just terminated
+                    if self.cur_cast_t:
+                        self.cast_times.append(self.cur_cast_t)
+                    self.cur_crawl_t = 0
+                else:
+                    self.cur_crawl_t += m.get_instance().dt
+            # Calculating time of a cast
             else:
-                self.cur_crawl_t += m.get_instance().dt
-        # Calculating time of a cast
-        else:
-            if LarvaState.is_crawling(self.prev_state):
-                # Starting a cast means a crawl was terminated
-                if self.cur_crawl_t:
-                    self.crawl_times.append(self.cur_crawl_t)
-                self.count_head_casts += 1
-                self.cur_cast_t = 0
-            else:
-                self.cur_cast_t += m.get_instance().dt
+                if LarvaState.is_crawling(self.prev_state):
+                    # Starting a cast means a crawl was terminated
+                    if self.cur_crawl_t:
+                        self.crawl_times.append(self.cur_crawl_t)
+                    self.count_head_casts += 1
+                    self.cur_cast_t = 0
+                else:
+                    self.cur_cast_t += m.get_instance().dt
 
         self.prev_state = state
 

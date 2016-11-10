@@ -19,6 +19,7 @@ class Model:
         self.source_decay_rate = source_decay_rate
         self.larvae = []
         # TODO: add other model objects and params (arena, etc)
+        self.views = []
     
     @staticmethod
     def get_instance(dt=0.1, source_position=np.array([0,0]), source_strength=10, source_decay_rate=5):
@@ -34,3 +35,22 @@ class Model:
         for l in self.larvae:
             l.update()
         self.time += self.dt
+
+    # View Services
+    def attach(self, view):
+        """Attaching a view to the model
+
+        Attaching a view adds it to the container and causes it to be updated
+        with all current Larva state information.
+        """
+        self.views.append(view)
+
+    # TODO: possibly add a way to detach a view, maybe not necessary. Maybe
+    # when you add a view, it is permanent. If you don't want it anymore,
+    # just don't draw it.
+
+    def notify_state(self, state, head_loc, joint_loc, velocity, head_angle):
+        """Notify the views about Larva state changes
+        """
+        for v in self.views:
+            v.update_view(self.time, state, head_loc, joint_loc, velocity, head_angle)
