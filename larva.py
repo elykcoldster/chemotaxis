@@ -20,6 +20,16 @@ class Larva:
         CAST_TURN_AFTER_MIN_ANGLE = 7
         CAST_TURN_TO_MIDDLE = 8
         CAST_TURN_RANDOM_DIR = 9
+        
+        @staticmethod
+        def is_crawling(state):
+            if (state == Larva.LarvaState.CRAWL_FWD or
+                state == Larva.LarvaState.WV_CRAWL_FWD or
+                state == Larva.LarvaState.WV_CRAWL_FWD_WHILE_CAST or
+                state == Larva.LarvaState.WV_CHANGE_CAST_DIR):
+                return True
+            return False
+
 
     def p_run_term(self):
         r = self.run_term_base
@@ -275,6 +285,8 @@ class Larva:
         fcn = getattr(self, fcn_name)
         fcn(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand)
 
+        m.get_instance().notify_state(self.state, self.head_loc, self.joint_loc, self.velocity, self.get_head_angle())
+
     def rotate_normal_cast(self):
         angle = m.get_instance().dt * self.cast_speed * self.cast_dir
         self.rotate_head(angle)
@@ -310,6 +322,7 @@ class Larva:
         new_vel = self.head_loc - self.joint_loc
         self.velocity = new_vel / np.linalg.norm(new_vel)
 
+    # TODO: Add a signed head angle function as well
     def get_head_angle(self):
         """Get absolute angle of head with respect to the midline (velocity vector)
         """

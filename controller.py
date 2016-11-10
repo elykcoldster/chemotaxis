@@ -33,6 +33,15 @@ class Controller:
                 print('Running ' + str(iters) + ' iteration(s)')
                 for i in range(iters):
                     m.get_instance().update()
+            elif cmd == 's':
+                # Run specified number of iterations, or just one if no arg given (without printing)
+                iters = 0
+                if not len(inputs):
+                    iters = 1
+                else:
+                    iters = int(inputs.popleft())
+                for i in range(iters):
+                    m.get_instance().update()
             elif cmd == 'p':
                 larvae = m.get_instance().larvae
                 for i in range(0,len(larvae)):
@@ -42,6 +51,9 @@ class Controller:
                 if len(larvae) == 0:
                     print('Nothing to print.')
             elif cmd == 'v':
+                # TODO: this has been moved into arena_view.py
+                # The code has been left here for reference. To be deleted
+                # after implementation in arena_view.py
                 larva = m.get_instance().larvae[0]
                 path = larva.path
                 head_locs = []
