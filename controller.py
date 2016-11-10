@@ -33,15 +33,6 @@ class Controller:
                 print('Running ' + str(iters) + ' iteration(s)')
                 for i in range(iters):
                     m.get_instance().update()
-            elif cmd == 's':
-            	# Run specified number of iterations, or just one if no arg given (without printing)
-            	iters = 0
-                if not len(inputs):
-                    iters = 1
-                else:
-                    iters = int(inputs.popleft())
-                for i in range(iters):
-                    m.get_instance().update()
             elif cmd == 'p':
                 larvae = m.get_instance().larvae
                 for i in range(0,len(larvae)):
