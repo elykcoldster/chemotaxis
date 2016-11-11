@@ -75,9 +75,7 @@ class Controller:
     def print_larva(self, args):
         larvae = m.get_instance().larvae
         for i in range(0,len(larvae)):
-            print('Larva ' + str(i + 1)
-                + '\tLocation: ' + str(larvae[i].head_loc)
-                + '\tVelocity: ' + str(larvae[i].velocity * larvae[i].v_fwd))
+            print('Larva {0} {1}'.format(i + 1, larvae[i]))
         if len(larvae) == 0:
             print('Nothing to print.')
 

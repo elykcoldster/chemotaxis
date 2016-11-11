@@ -333,3 +333,9 @@ class Larva:
     def larva_print(self, msg):
         if self.verbose:
             print(msg)
+
+    def __str__(self):
+        # TODO: Maybe output more things about the larva like current state,
+        # head angle, etc
+        return ('Location: ' + str(self.head_loc) + '\tVelocity: '
+                + str(self.velocity * self.v_fwd))
