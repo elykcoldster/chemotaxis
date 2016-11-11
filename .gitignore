@@ -4,3 +4,8 @@ __pycache__/
 # Visual Studio Code
 .vscode/
 
+# Image files
+*.png
+*.jpg
+*.tiff
+*.bmp

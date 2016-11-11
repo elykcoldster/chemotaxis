@@ -31,7 +31,6 @@ class ArenaView(View):
         plt.ylabel('y position')
 
         plt.gca().set_aspect('equal', adjustable='box')
-        plt.show()
 
     def clear(self):
         """Discard the saved information - empty view
@@ -43,4 +42,5 @@ class ArenaView(View):
         """Write out the view to file
         """
         # Save plot as png
-        raise NotImplementedError
+        self.draw()
+        plt.savefig(path + '.png')

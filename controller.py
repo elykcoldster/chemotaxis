@@ -61,7 +61,15 @@ class Controller:
                 arena_view = ArenaView()
                 m.get_instance().attach(arena_view)
             elif cmd == 'd':
-                for view in m.get_instance().views:
+                for index, view in enumerate(m.get_instance().views):
+                    plt.figure(index)
                     view.draw()
+                plt.show()
+            elif cmd == 'e':
+                if not len(inputs):
+                    print('Input a filename (without extension)')
+                else:
+                    for view in m.get_instance().views:
+                        view.export(inputs.popleft())
             else:
                 print('Invalid Input')
