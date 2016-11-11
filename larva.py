@@ -263,7 +263,7 @@ class Larva:
         self.verbose = False
 		
 
-    def update(self, prnt=True):
+    def update(self):
         """Update larva state based on transition probabilities
         """
         # print('Updating a larva')
@@ -281,7 +281,7 @@ class Larva:
         if not fcn_name:
             raise ValueError("Not a valid Larva State!")
         fcn = getattr(self, fcn_name)
-        fcn(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand, prnt)
+        fcn(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand)
 
         m.get_instance().notify_state(self.state, self.head_loc, self.joint_loc, self.velocity, self.get_head_angle())
 

@@ -30,10 +30,10 @@ class Model:
     def add_larva(self, l):
         self.larvae.append(l)
 
-    def update(self, prnt=True):
+    def update(self):
         """Increment the time and tell all objects to update themselves"""
         for l in self.larvae:
-            l.update(prnt)
+            l.update()
         self.time += self.dt
 
     # View Services
