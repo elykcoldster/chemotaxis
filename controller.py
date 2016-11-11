@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from model import Model as m
 from larva import Larva
+from arena_view import ArenaView
 
 
 class Controller:
@@ -53,31 +54,14 @@ class Controller:
                         + '\tVelocity: ' + str(larvae[i].velocity * larvae[i].v_fwd))
                 if len(larvae) == 0:
                     print('Nothing to print.')
-            elif cmd == 'v':
+            elif cmd == 'av':
                 # TODO: this has been moved into arena_view.py
                 # The code has been left here for reference. To be deleted
                 # after implementation in arena_view.py
-                larva = m.get_instance().larvae[0]
-                path = larva.path
-                head_locs = []
-                joint_locs = []
-                for i in range(0,len(path)):
-                    if len(head_locs) == 0:
-                        head_locs = [path[i][0:2]]
-                        joint_locs = [path[i][2:4]]
-                    else:
-                        head_locs = np.append(head_locs,[path[i][0:2]],axis = 0)
-                        joint_locs = np.append(joint_locs,[path[i][2:4]],axis = 0)
-                plt.plot(head_locs[:,0],head_locs[:,1],'b',linewidth=3)
-                plt.plot(joint_locs[:,0],joint_locs[:,1],'r',linewidth=2)
-                plt.title('Larva Trajectory')
-                plt.xlabel('x position')
-                plt.ylabel('y position')
-
-                #axis_min = np.minimum(np.amin(head_locs[:,0]), np.amin(head_locs[:,1]))
-                #axis_max = np.maximum(np.amax(head_locs[:,0]), np.amax(head_locs[:,1]))
-                #plt.axis([axis_min, axis_max, axis_min, axis_max])
-                plt.gca().set_aspect('equal', adjustable='box')
-                plt.show()
+                arena_view = ArenaView()
+                m.get_instance().attach(arena_view)
+            elif cmd == 'd':
+                for view in m.get_instance().views:
+                    view.draw()
             else:
                 print('Invalid Input')
