@@ -3,6 +3,7 @@ import numpy as np
 from model import Model as m
 from larva import Larva
 from view_factory import view_factory
+from util import Error
 
 class Controller:
     # Function dispatch table:
@@ -21,20 +22,26 @@ class Controller:
         """Run loop
         """
         while True:
-            input_str = input('Time: {0:.1f}, Enter command: '.format(m.get_instance().time))
-            inputs = deque(input_str.split())
-            cmd = ''
-            if len(inputs):
-                cmd = inputs.popleft()
-            if cmd == 'q':
-                print('Quiting')
-                return
-            fcn_name = self.command_fcns.get(cmd)
-            if not fcn_name:
-                print('Invalid input')
-                continue
-            fcn = getattr(self, fcn_name)
-            fcn(inputs)
+            try:
+                input_str = input('Time: {0:.1f}, Enter command: '.format(m.get_instance().time))
+                inputs = deque(input_str.split())
+                cmd = ''
+                if len(inputs):
+                    cmd = inputs.popleft()
+                if cmd == 'q':
+                    print('Quiting')
+                    return
+                fcn_name = self.command_fcns.get(cmd)
+                if not fcn_name:
+                    raise Error('Invalid input!')
+                    continue
+                fcn = getattr(self, fcn_name)
+                fcn(inputs)
+            except Error as err:
+                print(err)
+            except:
+                print('Unexpected error!')
+                raise
 
     def add_larva(self, args):
         """Add a larva with specified characteristics
@@ -74,21 +81,36 @@ class Controller:
         if len(larvae) == 0:
             print('Nothing to print.')
 
+    def get_attached_view(self, view_type_str):
+        """Helper function that retreives an already attached view
+
+        Throws an error if the view is not attached.
+        """
+        view = self.all_views.get(view_type_str)
+        if not view:
+            raise Error('Not an attached view!')
+        return view
+
     def attach_view(self, args):
         """Attach a specified view to the Model
+
+        Example:
+            'av ArenaView'
         """
         view_type = args.popleft()
         if self.all_views.get(view_type):
-            print('View already attached!')
-            return
+            raise Error('View already attached!')
         view = view_factory(view_type)
-        if not view:
-            return # TODO: Broken record: replace with exceptions
         m.get_instance().attach(view)
         self.all_views[view_type] = view
 
     def draw_view(self, args):
-        """
+        """Draw a specific view (or all views)
+
+        Example:
+            'd ArenaView'
+            or
+            'd all'
         """
         view_type = args.popleft()
         if view_type == 'all':
@@ -97,23 +119,16 @@ class Controller:
                 v.draw()
         else:
             # Draw just the specified view
-            view = self.all_views.get(view_type)
-            if not view:
-                # TODO: Use exception handling instead of this
-                print('Not an attached view!')
-                return
+            view = self.get_attached_view(view_type)
             view.draw()
 
     def export_view(self, args):
-        """
+        """Export the specified view to a file
+
+        Example:
+            'e TableView tableAsFile.txt'
         """
         view_type = args.popleft()
         path = args.popleft()
-        view = self.all_views.get(view_type)
-        if not view:
-            # TODO: Use exception handling, that will remove copy-pasted code
-            # like this
-            print('Not an attached view!')
-            return
+        view = self.get_attached_view(view_type)
         view.export(path)
-

@@ -1,6 +1,7 @@
 from table_view import TableView
 from stats_view import StatsView
 from arena_view import ArenaView
+from util import Error
 
 def view_factory(view_name):
     """Very simple form of factory function
@@ -15,8 +16,5 @@ def view_factory(view_name):
     elif view_name == ArenaView.__name__:
         view = ArenaView()
     else:
-        print('Bad view name!')
-    # TODO: will add exception handling later to propagate a "bad view name"
-    # error to the caller
+        raise Error('Bad view name!')
     return view
-    
