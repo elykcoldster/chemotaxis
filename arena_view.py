@@ -9,7 +9,7 @@ class ArenaView(View):
         self.joint_locs = []
         
 
-    def update_view(self, time, state, head_loc, joint_loc, velocity, head_angle):
+    def update_view(self, time, state, head_loc, joint_loc, velocity, head_angle, source_position):
         """Save information about the larva
         """
         if len(self.head_locs) == 0:

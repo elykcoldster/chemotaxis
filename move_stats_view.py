@@ -9,55 +9,99 @@ class MoveStatsView(View):
         self.reorientation_speeds = []
         self.head_angles = []
         self.bearings = []
+        self.time = 0
         
-    def calcBodyAngle(velocity):
-        # dot product between i-cap and velocity is just the x-component of velocity
-        alpha = np.arccos(velocity[0])
+    def getAngleWithXAxis(self, unitVector):
+        # dot product between i-cap and unit vector is just the x-component of unit vector
+        angle = np.arccos(unitVector[0])
         # since range of arccos is [0,pi], need to correct by looking at the y-value
-        if(velocity[1] < 0):
-            alpha = 2*np.pi - alpha
-        return np.degrees(alpha)
+        if(unitVector[1] < 0):
+            angle = 2*np.pi - angle
+            
+        # output is now in range [0, 360]
+        return np.degrees(angle)
         
+    def calcBodyAngle(self, velocity):
+        alpha = self.getAngleWithXAxis(velocity)
+        return alpha
         
-    def update_view(self, time, state, head_loc, joint_loc, velocity, head_angle):
+    def calcBearing(self, velocity, head_loc, source_loc):
+        #calculate angles of each of the vectors in consideration first
+        larva_to_source = source_loc - head_loc
+        body_angle = self.getAngleWithXAxis(velocity)
+        source_angle = self.getAngleWithXAxis(larva_to_source/np.linalg.norm(larva_to_source))
+        
+        #take difference
+        bearing = body_angle - source_angle
+        
+        #Difference is in range [-360, 360], so we bring it back to [-180, 180]
+        if 360 >= bearing > 180:
+            bearing = bearing - 360
+        elif -360 <= bearing < -180:
+            bearing = 360 + bearing
+        return bearing
+    
+    def calcReorientationSpeed(self, prev_angle, curr_angle, dt):
+        #calculate difference
+        reorientation = prev_angle - curr_angle
+        
+        #Difference is in range [-360, 360], so we bring it back to [-180, 180]
+        if 360>= reorientation > 180:
+            reorientation = reorientation - 360
+        elif -360 <= reorientation < -180:
+            reorientation = 360 + reorientation
+        
+        #divide by time step to get first order approximation of differential
+        return reorientation/dt
+        
+    def update_view(self, time, state, head_loc, joint_loc, velocity, head_angle, source_loc):
         """Save information about the movement stats of larva
         """
-        body_angle = calcBodyAngle(velocity)
+        
+        #calculate body angle and bearing
+        body_angle = self.calcBodyAngle(velocity)
+        bearing = self.calcBearing(velocity, head_loc, source_loc)
         if self.numTimeSteps == 0:
-            self.head_angles = [head_angle]
+            #just starting off
             self.body_angles = [body_angle]
+            self.reorientation_speeds = [0]
+            self.head_angles = [head_angle]
+            self.bearings = [bearing]
         else:
-            self.head_angles = np.append(self.head_angles, [head_angle], axis=0)
-            self.body_angles = np.append(self.body_angles, [body_angle], axis = 0)
+            #calculate time step
+            dt = time - self.time
+            
+            #get reorientation speed from previous and current body angle
+            reorientation_speed = self.calcReorientationSpeed(self.body_angles[len(self.body_angles)-1], body_angle, dt)
+            
+            #storing the history of the larva
+            self.body_angles.append(body_angle)
+            self.head_angles.append(head_angle)
+            self.reorientation_speeds.append(reorientation_speed)
+            self.bearings.append(bearing)
+        
+        #updating time
+        self.time = time            
+        self.numTimeSteps+=1
+
             
 
     def draw(self):
         """Prints out the current view
         """
-        plt.plot(self.head_locs[:,0],self.head_locs[:,1],'b',linewidth=3)
-        plt.plot(self.joint_locs[:,0],self.joint_locs[:,1],'r',linewidth=2)
-        plt.title('Larva Trajectory')
-        plt.xlabel('x position')
-        plt.ylabel('y position')
-
-        plt.gca().set_aspect('equal', adjustable='box')
+        #scatter plot of bearing versus reorientation speed
+        plt.scatter(self.bearings, self.reorientation_speeds)
+        plt.title('Reorientation speed vs Bearing')
+        plt.xlabel('Bearing')
+        plt.ylabel('Reorientation speed')        
         plt.show()
 
     def clear(self):
         """Discard the saved information - empty view
         """
-        self.head_locs = []
-        self.joint_locs = []
+        raise NotImplementedError
 
     def export(self, path):
         """Write out the view to file
         """
-        # Save plot as png
-        plt.plot(self.head_locs[:,0],self.head_locs[:,1],'b',linewidth=3)
-        plt.plot(self.joint_locs[:,0],self.joint_locs[:,1],'r',linewidth=2)
-        plt.title('Larva Trajectory')
-        plt.xlabel('x position')
-        plt.ylabel('y position')
-
-        plt.gca().set_aspect('equal', adjustable='box')
-        plt.savefig(path + '.png')
+        raise NotImplementedError

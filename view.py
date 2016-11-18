@@ -6,7 +6,7 @@ class View:
     def __init__(self):
         raise NotImplementedError(abstract_class_except_msg)
 
-    def update_view(self, time, state, head_loc, joint_loc, velocity, head_angle):
+    def update_view(self, time, state, head_loc, joint_loc, velocity, head_angle, source_position):
         """Save information about the larva
         """
         raise NotImplementedError(abstract_class_except_msg)

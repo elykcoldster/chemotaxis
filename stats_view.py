@@ -9,7 +9,7 @@ class StatsView(View):
         self.clear()
         self.prev_state = None
 
-    def update_view(self, time, state, head_loc, joint_loc, velocity, head_angle):
+    def update_view(self, time, state, head_loc, joint_loc, velocity, head_angle, source_position):
         # If view just created, and has no previous state, don't calculate
         # anything, wait till the next update
         if self.prev_state:

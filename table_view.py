@@ -6,7 +6,7 @@ class TableView(View):
         self.header = ["Time", "State", "Head Location", "Joint Location", "Velocity", "Head Angle"]
         self.table = []
 
-    def update_view(self, time, state, head_loc, joint_loc, velocity, head_angle):
+    def update_view(self, time, state, head_loc, joint_loc, velocity, head_angle, source_position):
         self.table.append([time, state.name, head_loc, joint_loc, velocity, head_angle])
 
     def draw(self):
