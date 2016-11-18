@@ -1,6 +1,8 @@
 from table_view import TableView
 from stats_view import StatsView
 from arena_view import ArenaView
+from move_stats_view import MoveStatsView
+
 from util import Error
 
 def view_factory(view_name):
@@ -15,6 +17,8 @@ def view_factory(view_name):
         view = StatsView()
     elif view_name == ArenaView.__name__:
         view = ArenaView()
+    elif view_name == MoveStatsView.__name__:
+        view = MoveStatsView()
     else:
         raise Error('Bad view name!')
     return view
