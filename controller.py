@@ -2,12 +2,14 @@ from collections import deque
 import numpy as np
 from model import Model as m
 from larva import Larva
+from arena import Arena
 from view_factory import view_factory
 from util import Error
 
 class Controller:
     # Function dispatch table:
     command_fcns = {'a': 'add_larva',
+                    'ar': 'add_arena',
                     'v': 'toggle_verbosity',
                     'r': 'run_model',
                     'p': 'print_larva',
@@ -53,6 +55,16 @@ class Controller:
         new_larva = Larva(np.array([loc_x, loc_y]), np.array([vel_x, vel_y]))
         m.get_instance().add_larva(new_larva)
         print('Added a larva: ' + str(new_larva))
+
+    def add_arena(self, args):
+        loc_x = float(args.popleft())
+        loc_y = float(args.popleft())
+        strength = float(args.popleft())
+        decay_rate = float(args.popleft())
+        new_arena = Arena(np.array([loc_x, loc_y]), strength, decay_rate)
+        m.get_instance().add_arena(new_arena)
+        print('Added Arena: ' + str(new_arena))
+        
 
     def toggle_verbosity(self, args):
         """Toggle if Larva prints on each update

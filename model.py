@@ -1,4 +1,5 @@
 import numpy as np
+from util import Error
 
 class Model:
     # A reference to the singleton object
@@ -17,7 +18,9 @@ class Model:
         self.source_position = source_position
         self.source_strength = source_strength
         self.source_decay_rate = source_decay_rate
+        self.sim_objs = []
         self.larvae = []
+        self.arena = None
         # TODO: add other model objects and params (arena, etc)
         self.views = []
     
@@ -29,11 +32,23 @@ class Model:
 
     def add_larva(self, l):
         self.larvae.append(l)
+        self.sim_objs.append(l)
+
+    def add_arena(self, a):
+        self.arena = a
+        # Add the arena to the top of the simulation object list, so that it
+        # always gets updated first
+        self.sim_objs.insert(0, a)
+
+    def get_arena(self):
+        if not self.arena:
+            raise Error('Must create the Arena!')
+        return self.arena
 
     def update(self):
         """Increment the time and tell all objects to update themselves"""
-        for l in self.larvae:
-            l.update()
+        for obj in self.sim_objs:
+            obj.update()
         self.time += self.dt
 
     # View Services
