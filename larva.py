@@ -3,9 +3,10 @@ import random as rn
 import math
 import numpy as np
 from model import Model as m
+from sim_object import SimObject
 
 
-class Larva:
+class Larva(SimObject):
 
     class LarvaState(Enum):
         # Crawl states
@@ -99,11 +100,7 @@ class Larva:
         return m.get_instance().dt * r_wv_cast_resume
 
     def perceive(self):
-        h2s = self.head_loc - m.get_instance().source_position
-        distance = np.linalg.norm(h2s)
-        strength = m.get_instance().source_strength
-        sigma = m.get_instance().source_decay_rate
-        return strength*1/np.sqrt(2*np.pi*sigma*sigma)*np.exp(-distance * distance/(2*sigma*sigma))
+        return m.get_instance().get_arena().concentration_at_loc(self.head_loc)
 
 
     def crawl_fwd(self, p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand):
