@@ -3,9 +3,10 @@ import random as rn
 import math
 import numpy as np
 from model import Model as m
+from sim_object import SimObject
 
 
-class Larva:
+class Larva(SimObject):
 
     class LarvaState(Enum):
         # Crawl states
