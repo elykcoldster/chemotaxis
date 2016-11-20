@@ -8,6 +8,8 @@ from util import Error
 
 class Controller:
     # Function dispatch table:
+    # TODO: modify the 'p' = 'print_larva' function to be a command that
+    # prints descriptions of ALL simulation objects.
     command_fcns = {'a': 'add_larva',
                     'ar': 'add_arena',
                     'v': 'toggle_verbosity',
@@ -20,12 +22,23 @@ class Controller:
     def __init__(self):
         self.all_views = {}
 
-    def run(self):
+    def run(self, input_file):
         """Run loop
         """
+        input_from_file = deque()
+        # Get any input given from file
+        if input_file:
+            input_from_file = deque([line.rstrip('\n') for line in open(input_file)])
+
         while True:
             try:
-                input_str = input('Time: {0:.1f}, Enter command: '.format(m.get_instance().time))
+                input_str = ''
+                # First read any commands given from a file, then begin to
+                # take user input
+                if len(input_from_file):
+                    input_str = input_from_file.popleft()
+                else:
+                    input_str = input('Time: {0:.1f}, Enter command: '.format(m.get_instance().time))
                 inputs = deque(input_str.split())
                 cmd = ''
                 if len(inputs):
