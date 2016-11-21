@@ -9,3 +9,4 @@ __pycache__/
 *.jpg
 *.tiff
 *.bmp
+.ipynb_checkpoints/Larva_chemotaxis-checkpoint.ipynb

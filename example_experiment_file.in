@@ -1,5 +1,5 @@
 a 1 1 1 1
 ar 0 0 10 5
-r 1000
-p
-q
+av MoveStatsView
+r 5000
+d MoveStatsView

@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from view import View
+from larva import Larva
 
 class MoveStatsView(View):
     def __init__(self):
@@ -9,7 +10,20 @@ class MoveStatsView(View):
         self.reorientation_speeds = []
         self.head_angles = []
         self.bearings = []
+        
+        #stores 0 if no turn, 1 if left turn, -1 if right turn
+        self.isTurn = []
+        
+        #parameters used for turn detection
+        self.currTurnLength = 0
+        self.currTurnDirection = 0
         self.time = 0
+        self.TURN_REORIENTATION_SPEED = 12
+        self.MAX_TIME_FOR_TURN = 1
+        
+        #parameters used for run length histogram calculation
+        self.runLengths = []
+        self.currRunLength = 0
         
     def getAngleWithXAxis(self, unitVector):
         # dot product between i-cap and unit vector is just the x-component of unit vector
@@ -67,12 +81,18 @@ class MoveStatsView(View):
             self.reorientation_speeds = [0]
             self.head_angles = [head_angle]
             self.bearings = [bearing]
+            self.isTurn = [0]
         else:
             #calculate time step
             dt = time - self.time
             
             #get reorientation speed from previous and current body angle
             reorientation_speed = self.calcReorientationSpeed(self.body_angles[len(self.body_angles)-1], body_angle, dt)
+            
+            #update turn statistics
+            self.updateTurns(reorientation_speed, time, dt)
+                
+            self.updateRunStats(state, dt)
             
             #storing the history of the larva
             self.body_angles.append(body_angle)
@@ -83,17 +103,68 @@ class MoveStatsView(View):
         #updating time
         self.time = time            
         self.numTimeSteps+=1
+    
+    def updateRunStats(self, state, dt):
+        if state in [Larva.LarvaState.CRAWL_FWD, Larva.LarvaState.WV_CRAWL_FWD, Larva.LarvaState.WV_CRAWL_FWD_WHILE_CAST]:
+            self.currRunLength += dt
+        else:
+            if self.currRunLength > 0:
+                self.runLengths.append(self.currRunLength)
+                self.currRunLength = 0
+    
+    def updateTurns(self, reorientation_speed, time, dt):
+        #storing which direction the larva is turning
+        if abs(reorientation_speed) > self.TURN_REORIENTATION_SPEED:                    
+            self.currTurnLength += dt
+            print("This is an instantaneous turn, Time =", time)
+            if reorientation_speed > 0:
+                self.turnDirection = 1
+            else:
+                self.turnDirection = -1
+        else:
+            self.currTurnLength = 0
+            self.turnDirection = 0
 
-            
+        if self.currTurnLength > self.MAX_TIME_FOR_TURN:
+            self.isTurn.append(self.turnDirection)
+        elif self.currTurnLength == self.MAX_TIME_FOR_TURN:
+            print("This is a continous turn (turning for more than a second), Time =", time)
+            self.isTurn.append(0)
+            for i in range(len(self.isTurn)-self.currTurnLength/dt,len(self.isTurn)):
+                self.isTurn[i] = self.turnDirection
+        else:
+            self.isTurn.append(0)
 
     def draw(self):
         """Prints out the current view
         """
+        plt.figure()
         #scatter plot of bearing versus reorientation speed
+        plt.subplot(221)
         plt.scatter(self.bearings, self.reorientation_speeds)
         plt.title('Reorientation speed vs Bearing')
         plt.xlabel('Bearing')
-        plt.ylabel('Reorientation speed')        
+        plt.ylabel('Reorientation speed')  
+        
+        plt.subplot(222)
+        bearingFreqs = []
+        for i in range(len(self.bearings)):
+            bearing = self.bearings[i]
+            if self.isTurn[i]==1:
+                print("Found left turn")
+                bearingFreqs.append(bearing)
+        
+        plt.hist(bearingFreqs, bins = 12, normed=True)
+        plt.title('Probability Left Turn vs Bearing')
+        plt.xlabel('Bearing')
+        plt.ylabel('Left turn frequency')
+        
+        plt.subplot(223)
+        plt.hist(self.runLengths, bins = 5)
+        plt.title('Run Length Histogram')
+        plt.xlabel('Run lengths (s)')
+        plt.ylabel('Proportion of runs')
+        plt.tight_layout()
         plt.show()
 
     def clear(self):
