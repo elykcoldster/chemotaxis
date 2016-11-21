@@ -55,18 +55,23 @@ class MoveStatsView(View):
             bearing = 360 + bearing
         return bearing
     
-    def calcReorientationSpeed(self, prev_angle, curr_angle, dt):
-        #calculate difference
-        reorientation = prev_angle - curr_angle
-        
-        #Difference is in range [-360, 360], so we bring it back to [-180, 180]
-        if 360>= reorientation > 180:
-            reorientation = reorientation - 360
-        elif -360 <= reorientation < -180:
-            reorientation = 360 + reorientation
-        
+    def calcReorientationSpeed(self, body_angles, dt):
+        total_reorientation = 0;
+        num_samples = int(1/dt);
+        for i in range(len(body_angles) - num_samples, len(body_angles)):
+            if i < 1:
+                break
+            #calculate difference
+            reorientation = body_angles[i] - body_angles[i-1]
+            
+            #Difference is in range [-360, 360], so we bring it back to [-180, 180]
+            if 360>= reorientation > 180:
+                reorientation = reorientation - 360
+            elif -360 <= reorientation < -180:
+                reorientation = 360 + reorientation
+            total_reorientation += reorientation
         #divide by time step to get first order approximation of differential
-        return reorientation/dt
+        return total_reorientation
         
     def update_view(self, time, state, head_loc, joint_loc, velocity, head_angle, source_loc):
         """Save information about the movement stats of larva
@@ -87,7 +92,7 @@ class MoveStatsView(View):
             dt = time - self.time
             
             #get reorientation speed from previous and current body angle
-            reorientation_speed = self.calcReorientationSpeed(self.body_angles[len(self.body_angles)-1], body_angle, dt)
+            reorientation_speed = self.calcReorientationSpeed(self.body_angles, dt)
             
             #update turn statistics
             self.updateTurns(reorientation_speed, time, dt)
