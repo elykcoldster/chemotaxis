@@ -3,6 +3,7 @@ import numpy as np
 from model import Model as m
 from larva import Larva
 from arena import Arena
+from decay_arena import DecayArena
 from view_factory import view_factory
 from util import Error
 
@@ -15,6 +16,7 @@ class Controller:
                     'v': 'toggle_verbosity',
                     'r': 'run_model',
                     'p': 'print_larva',
+                    'pa': 'print_arena',
                     'av': 'attach_view',
                     'd': 'draw_view',
                     'e': 'export_view'}
@@ -70,11 +72,19 @@ class Controller:
         print('Added a larva: ' + str(new_larva))
 
     def add_arena(self, args):
+        arena_type = args.popleft()
         loc_x = float(args.popleft())
         loc_y = float(args.popleft())
         strength = float(args.popleft())
-        decay_rate = float(args.popleft())
-        new_arena = Arena(np.array([loc_x, loc_y]), strength, decay_rate)
+        variance = float(args.popleft())
+
+        if arena_type.lower() == 'arena':
+            new_arena = Arena(np.array([loc_x, loc_y]), strength, variance)
+        elif arena_type.lower() == 'decayarena':
+            new_arena = DecayArena(np.array([loc_x, loc_y]), strength, variance)
+        else:
+            print('Invalid Input!')
+            return
         m.get_instance().add_arena(new_arena)
         print('Added Arena: ' + str(new_arena))
         
@@ -103,6 +113,12 @@ class Controller:
             print('Larva {0} {1}'.format(i + 1, larvae[i]))
         if len(larvae) == 0:
             print('Nothing to print.')
+    def print_arena(self, args):
+        arena = m.get_instance().get_arena()
+        if arena:
+            print('Source Location: ' + str(arena.source_position)
+                +'\tSource Strength: ' + str(arena.source_strength)
+                +'\tSource Variance: ' + str(arena.sigma))
 
     def get_attached_view(self, view_type_str):
         """Helper function that retreives an already attached view
