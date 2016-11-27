@@ -332,23 +332,41 @@ class Larva(SimObject):
     def correct_wall_collision(self):
         head_x = self.head_loc[0]
         head_y = self.head_loc[1]
+        origin_head_x = head_x - self.joint_loc[0]
+        origin_head_y = head_y - self.joint_loc[1]
         arena = m.get_instance().get_arena()
         head_update = None
         # If out of bounds rotate the head to be aligned with the arena wall
         if head_x <= arena.x_min or head_x >= arena.x_max:
-            head_update = np.array([0, 1]) if head_y >=0 else np.array([0, -1])
+            if origin_head_y == 0:
+                # if the collision was "head on" (exactly perpendicular),
+                # redirect the head towards the side with more room, away from 
+                # other walls
+                wall_range = arena.y_max - arena.y_min
+                head_vert_dist = (head_y - arena.y_min) / wall_range
+                head_update = np.array([0, -1]) if head_vert_dist >= 0.5 else np.array([0, 1])
+            else:
+                head_update = np.array([0, 1]) if origin_head_y > 0 else np.array([0, -1])
         elif head_y <= arena.y_min or head_y >= arena.y_max:
-            head_update = np.array([1,0]) if head_x >= 0 else np.array([-1, 0])
+            if origin_head_x == 0:
+                wall_range = arena.x_max - arena.x_min
+                head_horiz_dist = (head_x - arena.x_min) / wall_range
+                head_update = np.array([-1, 0]) if head_horiz_dist >= 0.5 else np.array([1, 0])
+            else:
+                head_update = np.array([1, 0]) if origin_head_x >= 0 else np.array([-1, 0])
         else:
             # Wasn't out of bounds
             return
+        old_head_loc = self.head_loc
         self.head_loc = self.joint_loc + head_update
-        # If the larva was crawling, update the velocity
-        if Larva.LarvaState.is_crawling(self.state):
-            self.update_velocity()
-        # Otherwise, it must have been casting, so just flip turn direction
-        else:
-            self.cast_dir *= -1
+        if self.get_head_angle() > 90:
+            self.head_loc = old_head_loc
+            head_update = np.dot(-1, head_update)
+            self.head_loc = self.joint_loc + head_update
+        self.update_velocity()
+        # If it was casting, restart the cast
+        if not Larva.LarvaState.is_crawling(self.state):
+            self.state = Larva.LarvaState.CAST_START
 
     def larva_print(self, msg):
         if self.verbose:
