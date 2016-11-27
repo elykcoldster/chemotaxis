@@ -61,10 +61,10 @@ class Controller:
     def add_larva(self, args):
         """Add a larva with specified characteristics
         """
-        loc_x = int(args.popleft())
-        loc_y = int(args.popleft())
-        vel_x = int(args.popleft())
-        vel_y = int(args.popleft())
+        loc_x = float(args.popleft())
+        loc_y = float(args.popleft())
+        vel_x = float(args.popleft())
+        vel_y = float(args.popleft())
         new_larva = Larva(np.array([loc_x, loc_y]), np.array([vel_x, vel_y]))
         m.get_instance().add_larva(new_larva)
         print('Added a larva: ' + str(new_larva))
@@ -74,7 +74,7 @@ class Controller:
         loc_y = float(args.popleft())
         strength = float(args.popleft())
         decay_rate = float(args.popleft())
-        new_arena = Arena(np.array([loc_x, loc_y]), strength, decay_rate)
+        new_arena = Arena(source_position=np.array([loc_x, loc_y]), source_strength=strength, source_decay_rate=decay_rate)
         m.get_instance().add_arena(new_arena)
         print('Added Arena: ' + str(new_arena))
         

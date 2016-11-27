@@ -305,11 +305,13 @@ class Larva(SimObject):
         self.head_loc = np.dot(rotation_matrix, self.head_loc)
         # Translate back to original region
         self.head_loc += self.joint_loc
+        self.correct_wall_collision()
 
     def move_forward(self):
         distance = m.get_instance().dt * self.v_fwd  # TODO: set dt in Model
         self.head_loc = self.head_loc + distance * self.velocity
         self.joint_loc = self.joint_loc + distance * self.velocity
+        self.correct_wall_collision()
     
     def update_velocity(self):
         """Set velocity to be in the direction of vector from joint to head
@@ -326,6 +328,27 @@ class Larva(SimObject):
         # We have to clamp the cosine angle because of rounding errors (an issue when the two vectors point in the same direction)
         cos_theta = min(1.0, max(cos_theta, -1.0))
         return math.degrees(math.acos(cos_theta))
+
+    def correct_wall_collision(self):
+        head_x = self.head_loc[0]
+        head_y = self.head_loc[1]
+        arena = m.get_instance().get_arena()
+        head_update = None
+        # If out of bounds rotate the head to be aligned with the arena wall
+        if head_x <= arena.x_min or head_x >= arena.x_max:
+            head_update = np.array([0, 1]) if head_y >=0 else np.array([0, -1])
+        elif head_y <= arena.y_min or head_y >= arena.y_max:
+            head_update = np.array([1,0]) if head_x >= 0 else np.array([-1, 0])
+        else:
+            # Wasn't out of bounds
+            return
+        self.head_loc = self.joint_loc + head_update
+        # If the larva was crawling, update the velocity
+        if Larva.LarvaState.is_crawling(self.state):
+            self.update_velocity()
+        # Otherwise, it must have been casting, so just flip turn direction
+        else:
+            self.cast_dir *= -1
 
     def larva_print(self, msg):
         if self.verbose:
