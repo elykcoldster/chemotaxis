@@ -84,7 +84,8 @@ class Controller:
         loc_x = float(args.popleft())
         loc_y = float(args.popleft())
         strength = float(args.popleft())
-        new_arena = DisperseArena(source_position=np.array([loc_x, loc_y]), source_strength=strength)
+        sigma = float(args.popleft())
+        new_arena = DisperseArena(source_position=np.array([loc_x, loc_y]), source_strength=strength, sigma=sigma)
         m.get_instance().add_arena(new_arena)
         print('Added Arena: ' + str(new_arena))
 
