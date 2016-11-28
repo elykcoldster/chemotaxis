@@ -17,6 +17,8 @@ class Arena(SimObject):
     def concentration_at_loc(self, loc):
         distance = np.linalg.norm(loc - self.source_position)
         return self.source_strength*1/np.sqrt(2*np.pi*self.sigma**2)*np.exp(-distance * distance/(2*self.sigma**2))
+    def base_concentration(self):
+        return self.source_strength*1/np.sqrt(2*np.pi*self.sigma**2)
     
     def __str__(self):
         return ('Source Location: ' + str(self.source_position)

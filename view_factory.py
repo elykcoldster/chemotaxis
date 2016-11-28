@@ -1,6 +1,7 @@
 from table_view import TableView
 from stats_view import StatsView
 from arena_view import ArenaView
+from perception_view import PerceptionView
 from util import Error
 
 def view_factory(view_name):
@@ -15,6 +16,8 @@ def view_factory(view_name):
         view = StatsView()
     elif view_name == ArenaView.__name__:
         view = ArenaView()
+    elif view_name == PerceptionView.__name__:
+        view = PerceptionView()
     else:
         raise Error('Bad view name!')
     return view
