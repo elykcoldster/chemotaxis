@@ -74,7 +74,9 @@ class Controller:
         loc_y = float(args.popleft())
         strength = float(args.popleft())
         decay_rate = float(args.popleft())
-        new_arena = Arena(np.array([loc_x, loc_y]), strength, decay_rate)
+        length = float(args.popleft())
+        width = float(args.popleft())
+        new_arena = Arena(np.array([loc_x, loc_y]), strength, decay_rate, length, width)
         m.get_instance().add_arena(new_arena)
         print('Added Arena: ' + str(new_arena))
         

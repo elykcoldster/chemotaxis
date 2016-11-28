@@ -2,10 +2,12 @@ import numpy as np
 from sim_object import SimObject
 
 class Arena(SimObject):
-    def __init__(self, source_position=np.array([0,0]), source_strength=10, source_decay_rate=5):
+    def __init__(self, source_position=np.array([0,0]), source_strength=10, source_decay_rate=5, arena_length=20, arena_width=16):
         self.source_position = source_position
         self.source_strength = source_strength
         self.sigma = source_decay_rate
+        self.length = arena_length # x-size
+        self.width = arena_width # y-size
 
     def update(self):
         pass

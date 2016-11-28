@@ -308,8 +308,10 @@ class Larva(SimObject):
 
     def move_forward(self):
         distance = m.get_instance().dt * self.v_fwd  # TODO: set dt in Model
-        self.head_loc = self.head_loc + distance * self.velocity
-        self.joint_loc = self.joint_loc + distance * self.velocity
+        if self.collision_check(distance):
+            self.head_loc = self.head_loc + distance * self.velocity
+            self.joint_loc = self.joint_loc + distance * self.velocity
+        # self.bounce_check()
     
     def update_velocity(self):
         """Set velocity to be in the direction of vector from joint to head
@@ -331,6 +333,42 @@ class Larva(SimObject):
         if self.verbose:
             print(msg)
 
+    def collision_check(self, distance):
+        xbound = m.get_instance().arena.length / 2
+        ybound = m.get_instance().arena.width / 2
+
+        projection = self.head_loc + distance * self.velocity
+        if projection[0] > xbound or projection[0] < -xbound or projection[1] > ybound or projection[1] < -ybound:
+            self.state = Larva.LarvaState.CAST_START
+            return False
+        return True
+
+    def bounce_check(self):
+        # this doesn't work... i left the code here in case someone wanted to try the "bounce" method
+        xbound = m.get_instance().arena.length / 2
+        ybound = m.get_instance().arena.width / 2
+        if (self.head_loc[0] > xbound or self.head_loc[0] < -xbound) and (self.head_loc[1] > ybound or self.head_loc[1] < -ybound):
+            # reverse direction if it hits corner
+            print('corner hit')
+            xsx = abs(self.head_loc[0] - xbound)
+            xsy = abs(self.head_loc[1] - ybound)
+            self.head_loc[0] -= np.sign(self.head_loc[0] - xbound) * xsx
+            self.head_loc[1] -= np.sign(self.head_loc[1] - ybound) * xsy
+            self.velocity = -self.velocity
+        elif self.head_loc[0] > xbound or self.head_loc[0] < -xbound:
+            print('x hit')
+            # reflect across xbound
+            excess = abs(self.head_loc[0] - xbound)
+            print(self.head_loc)
+            self.head_loc[0] -= np.sign(self.head_loc[0] - xbound) * excess # adds if negative, subtracts if positive
+            print(self.head_loc)
+            self.velocity[0] = -self.velocity[0]
+        elif self.head_loc[1] > ybound or self.head_loc[1] < -ybound:
+            print('y hit')
+            # reflect across ybound
+            excess = abs(self.head_loc[1] - ybound)
+            self.head_loc[1] -= np.sign(self.head_loc[1] - ybound) * excess # adds if negative, subtracts if positive
+            self.velocity[1] = -self.velocity[1]
     def __str__(self):
         # TODO: Maybe output more things about the larva like current state,
         # head angle, etc
