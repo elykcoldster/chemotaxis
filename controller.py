@@ -3,6 +3,7 @@ import numpy as np
 from model import Model as m
 from larva import Larva
 from arena import Arena
+from disperse_arena import DisperseArena
 from view_factory import view_factory
 from util import Error
 
@@ -12,6 +13,7 @@ class Controller:
     # prints descriptions of ALL simulation objects.
     command_fcns = {'a': 'add_larva',
                     'ar': 'add_arena',
+                    'ad': 'add_disperse_arena',
                     'v': 'toggle_verbosity',
                     'r': 'run_model',
                     'p': 'print_larva',
@@ -77,7 +79,14 @@ class Controller:
         new_arena = Arena(source_position=np.array([loc_x, loc_y]), source_strength=strength, source_decay_rate=decay_rate)
         m.get_instance().add_arena(new_arena)
         print('Added Arena: ' + str(new_arena))
-        
+    
+    def add_disperse_arena(self, args):
+        loc_x = float(args.popleft())
+        loc_y = float(args.popleft())
+        strength = float(args.popleft())
+        new_arena = DisperseArena(source_position=np.array([loc_x, loc_y]), source_strength=strength)
+        m.get_instance().add_arena(new_arena)
+        print('Added Arena: ' + str(new_arena))
 
     def toggle_verbosity(self, args):
         """Toggle if Larva prints on each update
