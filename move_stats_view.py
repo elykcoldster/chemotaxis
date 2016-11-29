@@ -141,7 +141,6 @@ class MoveStatsView(View):
         for i in range(len(self.bearings)):
             bearing = self.bearings[i]
             if self.isTurn[i]==1:
-                print("Found left turn")
                 bearingFreqs.append(bearing)
         
         plt.hist(bearingFreqs, bins = 12, normed=True)
