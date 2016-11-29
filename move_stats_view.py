@@ -76,7 +76,7 @@ class MoveStatsView(View):
         
         #calculate body angle and bearing
         body_angle = self.calcBodyAngle(velocity)
-        bearing = self. (velocity, head_loc, source_loc)
+        bearing = self.calcBearing(velocity, head_loc, source_loc)
         if self.numTimeSteps == 0:
             #just starting off
             self.body_angles = [body_angle]
