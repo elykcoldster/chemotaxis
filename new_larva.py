@@ -24,16 +24,16 @@ class NewLarva(SimObject):
         
         @staticmethod
         def is_crawling(state):
-            if (state == Larva.LarvaState.CRAWL_FWD or
-                state == Larva.LarvaState.WV_CRAWL_FWD or
-                state == Larva.LarvaState.WV_CRAWL_FWD_WHILE_CAST or
-                state == Larva.LarvaState.WV_CHANGE_CAST_DIR):
+            if (state == NewLarva.LarvaState.CRAWL_FWD or
+                state == NewLarva.LarvaState.WV_CRAWL_FWD or
+                state == NewLarva.LarvaState.WV_CRAWL_FWD_WHILE_CAST or
+                state == NewLarva.LarvaState.WV_CHANGE_CAST_DIR):
                 return True
             return False
 
     def p_run_term_new(self):
         lda = 1/(1+np.exp(-(self.g0+self.g1*self.y)))
-        return lda
+        return lda*m.get_instance().dt
 
     def p_run_term(self):
         r = self.run_term_base
@@ -54,6 +54,8 @@ class NewLarva(SimObject):
 
     def p_cast_term_new(self):
         # need to define a good measure for cast termination using the IFB+IFF motif
+        lda = 1/(1+np.exp(-(self.g2+self.g3*self.y)))
+        return lda*m.get_instance().dt
 
     def p_cast_term(self):
         r = self.cast_term_base
@@ -213,7 +215,7 @@ class NewLarva(SimObject):
                   LarvaState.CAST_TURN_TO_MIDDLE: 'cast_turn_to_middle',
                   LarvaState.CAST_TURN_RANDOM_DIR: 'cast_turn_random_dir'}
 
-    def __init__(self, location, velocity, head_length=1, theta_max=120.0, theta_min=37, cast_speed=240, wv_theta_max=20, wv_cast_speed=60, v_fwd=1.0, t_min_run=7, run_term_base=0.148, cast_term_base=2, wv_term_base=2, wv_cast_resume=1, t_run_term=20, t_cast_term=1, r_wv_cast_resume = 1, t_wv_long_avg = 10, t_wv_short_avg = 1, k_wv_mult = 30):
+    def __init__(self, location, velocity, head_length=1, theta_max=120.0, theta_min=37, cast_speed=240, wv_theta_max=20, wv_cast_speed=60, v_fwd=1.0, t_min_run=1, run_term_base=0.148, cast_term_base=2, wv_term_base=2, wv_cast_resume=1, t_run_term=20, t_cast_term=0.5, r_wv_cast_resume = 1, t_wv_long_avg = 10, t_wv_short_avg = 1, k_wv_mult = 30):
         """Larva ctor
 
         Args:
@@ -266,7 +268,10 @@ class NewLarva(SimObject):
         self.verbose = False
 		
         self.g0 = -0.8156
-        self.g1 = -0.045
+        self.g1 = -0.011
+        self.g2 = 0.8
+        self.g3 = 0.045
+
         self.a1 = 0.13
         self.a2 = 0.26
         self.a3 = 1.1
@@ -281,7 +286,7 @@ class NewLarva(SimObject):
         self.y = 0
 
     def update_osn(self, n):
-        x = self.perceive() * 1000
+        x = self.perceive()
         n = self.n
         a1 = self.a1
         a2 = self.a2
@@ -313,6 +318,8 @@ class NewLarva(SimObject):
         p_cast_term = self.p_cast_term()
         p_wv = self.p_wv()
         p_wv_cast_resume = self.p_wv_cast_resume()
+
+        #print(self.perceive())
 
         self.history.append(self.perceive())
 

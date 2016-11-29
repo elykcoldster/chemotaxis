@@ -31,7 +31,7 @@ class ArenaView(View):
         ymin = m.get_instance().get_arena().y_min
         ymax = m.get_instance().get_arena().y_max
         xgrid, ygrid = np.mgrid[xmin:xmax:(xmax-xmin)/nx,ymin:ymax:(ymax-ymin)/ny]
-        cmap = plt.cm.Reds
+        cmap = plt.cm.gray
         cmap.set_bad('white')
         im = xgrid * 0;
         for i in range(0, int(nx)):
