@@ -251,7 +251,7 @@ class NewLarva(SimObject):
         self.wv_cast_resume = wv_cast_resume
         # run termination time and kernel
         self.t_run_term = t_run_term
-        self.k_run_term = np.arange(1, -1, -m.get_instance().dt/t_run_term)
+        self.k_run_term = np.arange(2, -2, -m.get_instance().dt/t_run_term)
         # cast termination time and kernel
         self.t_cast_term = t_cast_term
         self.k_cast_term = np.arange(0, 150, m.get_instance().dt/t_cast_term) # may need piecewise kernel later
