@@ -207,7 +207,7 @@ class Larva(SimObject):
                   LarvaState.CAST_TURN_TO_MIDDLE: 'cast_turn_to_middle',
                   LarvaState.CAST_TURN_RANDOM_DIR: 'cast_turn_random_dir'}
 
-    def __init__(self, location, velocity, head_length=1, theta_max=120.0, theta_min=37, cast_speed=240, wv_theta_max=20, wv_cast_speed=60, v_fwd=1.0, t_min_run=7, run_term_base=0.148, cast_term_base=2, wv_term_base=2, wv_cast_resume=1, t_run_term=20, t_cast_term=1, r_wv_cast_resume = 1, t_wv_long_avg = 10, t_wv_short_avg = 1, k_wv_mult = 30):
+    def __init__(self, location, velocity, head_length=1, theta_max=120.0, theta_min=37, cast_speed=240, wv_theta_max=20, wv_cast_speed=60, v_fwd=1.0, t_min_run=1, run_term_base=0.148, cast_term_base=2, wv_term_base=2, wv_cast_resume=1, t_run_term=20, t_cast_term=0.5, r_wv_cast_resume = 1, t_wv_long_avg = 10, t_wv_short_avg = 1, k_wv_mult = 30):
         """Larva ctor
 
         Args:
