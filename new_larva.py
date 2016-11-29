@@ -61,7 +61,7 @@ class NewLarva(SimObject):
         r = self.cast_term_base
         dt = m.get_instance().dt
         if len(self.history) > 1:
-            term_time = np.minimum(len(self.history) * dt, self.t_run_term)
+            term_time = np.minimum(len(self.history) * dt, self.t_cast_term)
             for t in np.arange(0,term_time,dt):
                 tsteps = int(t/dt)
                 C = self.history[len(self.history) - tsteps - 1]
@@ -251,10 +251,11 @@ class NewLarva(SimObject):
         self.wv_cast_resume = wv_cast_resume
         # run termination time and kernel
         self.t_run_term = t_run_term
-        self.k_run_term = np.arange(2, -2, -m.get_instance().dt/t_run_term)
+        self.k_run_term = np.arange(2, -2, -4*m.get_instance().dt/t_run_term)
         # cast termination time and kernel
         self.t_cast_term = t_cast_term
-        self.k_cast_term = np.arange(0, 150, m.get_instance().dt/t_cast_term) # may need piecewise kernel later
+        self.k_cast_term = np.arange(0, 150, 150*m.get_instance().dt/t_cast_term) # may need piecewise kernel later
+
         # weathervane parameters
         self.r_wv_cast_resume = r_wv_cast_resume
         self.t_wv_long_avg = t_wv_long_avg
@@ -319,7 +320,7 @@ class NewLarva(SimObject):
         p_wv = self.p_wv()
         p_wv_cast_resume = self.p_wv_cast_resume()
 
-        #print(self.perceive())
+        #print(p_cast_term)
 
         self.history.append(self.perceive())
 
