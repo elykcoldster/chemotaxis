@@ -67,4 +67,4 @@ class Model:
         """Notify the views about Larva state changes
         """
         for v in self.views:
-            v.update_view(self.time, state, head_loc, joint_loc, velocity, head_angle)
+            v.update_view(self.time, state, head_loc, joint_loc, velocity, head_angle, self.source_position)

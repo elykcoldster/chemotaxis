@@ -1,5 +1,6 @@
 #import pdb
 import sys
+import random as rn
 from controller import Controller
 
 
@@ -15,4 +16,5 @@ def main():
 
 if __name__ == "__main__":
     #pdb.set_trace()
+    rn.seed(1234)
     main()

@@ -2,6 +2,7 @@ from enum import Enum
 import random as rn
 import math
 import numpy as np
+import util
 from model import Model as m
 from sim_object import SimObject
 
@@ -33,71 +34,16 @@ class Larva(SimObject):
 
 
     def p_run_term(self):
-        r = self.run_term_base
-        dt = m.get_instance().dt
-        if len(self.history) > 1:
-            term_time = np.minimum(len(self.history) * dt, self.t_run_term)
-            for t in np.arange(0,term_time,dt):
-                tsteps = int(t/dt)
-                C = self.history[len(self.history) - tsteps - 1]
-                C_prev = self.history[len(self.history) - tsteps - 2]
-
-                phi = 0
-                if len(self.history) - tsteps - 2 >= 0:
-                    phi = (np.log(C)-np.log(C_prev))/dt
-                kernel = self.k_run_term[len(self.k_run_term) - tsteps - 1]
-                r += phi * kernel
-        return m.get_instance().dt * r
+        raise NotImplementedError(util.abstract_class_except_msg)
 
     def p_cast_term(self):
-        r = self.cast_term_base
-        dt = m.get_instance().dt
-        if len(self.history) > 1:
-            term_time = np.minimum(len(self.history) * dt, self.t_run_term)
-            for t in np.arange(0,term_time,dt):
-                tsteps = int(t/dt)
-                C = self.history[len(self.history) - tsteps - 1]
-                C_prev = self.history[len(self.history) - tsteps - 2]
-
-                phi = 0
-                if len(self.history) - tsteps - 2 >= 0:
-                    phi = (np.log(C)-np.log(C_prev))/dt
-                kernel = self.k_cast_term[len(self.k_cast_term) - tsteps - 1]
-                r += phi * kernel
-        return m.get_instance().dt * r
+        raise NotImplementedError(util.abstract_class_except_msg)
 
     def p_wv(self):
-
-        p_wv = self.wv_term_base
-        t_wv_long_avg = self.t_wv_long_avg
-        t_wv_short_avg = self.t_wv_short_avg
-        k_wv_mult = self.k_wv_mult
-
-        dt = m.get_instance().dt
-        if len(self.history) > 1:
-            term_time = np.minimum(len(self.history) * dt, t_wv_short_avg + t_wv_long_avg)
-            for t in np.arange(0, term_time, dt):
-                tsteps = int(t/dt)
-                C = self.history[len(self.history) - tsteps - 1]
-                C_prev = self.history[len(self.history) - tsteps - 2]
-
-                phi = 0
-
-                if len(self.history) - tsteps - 2 >= 0:
-                    phi = (np.log(C) - np.log(C_prev))/dt;
-
-                # assuming multiplicative factor of 30 until we go t_short_avg steps back
-                # assuming multiplicative factor of -30 in range [t_short_avg, t_short_avg+t_long_avg]
-                # all these kernels don't make sense in a few cases because the probabilities
-                # might go below 0 or above 1 in certain cases
-                kernel = k_wv_mult if t <= t_wv_short_avg else -1*k_wv_mult
-                p_wv += kernel*phi
-
-        return m.get_instance().dt * p_wv
+        raise NotImplementedError(util.abstract_class_except_msg)
 
     def p_wv_cast_resume(self):
-        r_wv_cast_resume = self.r_wv_cast_resume
-        return m.get_instance().dt * r_wv_cast_resume
+        raise NotImplementedError(util.abstract_class_except_msg)
 
     def perceive(self):
         return m.get_instance().get_arena().concentration_at_loc(self.head_loc)
@@ -207,7 +153,7 @@ class Larva(SimObject):
                   LarvaState.CAST_TURN_TO_MIDDLE: 'cast_turn_to_middle',
                   LarvaState.CAST_TURN_RANDOM_DIR: 'cast_turn_random_dir'}
 
-    def __init__(self, location, velocity, head_length=1, theta_max=120.0, theta_min=37, cast_speed=240, wv_theta_max=20, wv_cast_speed=60, v_fwd=1.0, t_min_run=7, run_term_base=0.148, cast_term_base=2, wv_term_base=2, wv_cast_resume=1, t_run_term=20, t_cast_term=1, r_wv_cast_resume = 1, t_wv_long_avg = 10, t_wv_short_avg = 1, k_wv_mult = 30):
+    def __init__(self, location, velocity, head_length=1, theta_max=120.0, theta_min=37, cast_speed=240, wv_theta_max=20, wv_cast_speed=60, v_fwd=1.0, t_min_run=1, run_term_base=0.148, cast_term_base=2, wv_term_base=2, wv_cast_resume=1, t_run_term=20, t_cast_term=0.5, r_wv_cast_resume = 1, t_wv_long_avg = 10, t_wv_short_avg = 1, k_wv_mult = 30):
         """Larva ctor
 
         Args:
@@ -243,10 +189,10 @@ class Larva(SimObject):
         self.wv_cast_resume = wv_cast_resume
         # run termination time and kernel
         self.t_run_term = t_run_term
-        self.k_run_term = np.arange(1, -1, -m.get_instance().dt/t_run_term)
+        self.k_run_term = np.arange(2, -2, -4*m.get_instance().dt/t_run_term)
         # cast termination time and kernel
         self.t_cast_term = t_cast_term
-        self.k_cast_term = np.arange(0, 150, m.get_instance().dt/t_cast_term) # may need piecewise kernel later
+        self.k_cast_term = np.arange(0, 150, 150*m.get_instance().dt/t_cast_term) # may need piecewise kernel later
         # weathervane parameters
         self.r_wv_cast_resume = r_wv_cast_resume
         self.t_wv_long_avg = t_wv_long_avg
@@ -305,11 +251,13 @@ class Larva(SimObject):
         self.head_loc = np.dot(rotation_matrix, self.head_loc)
         # Translate back to original region
         self.head_loc += self.joint_loc
+        self.correct_wall_collision()
 
     def move_forward(self):
         distance = m.get_instance().dt * self.v_fwd  # TODO: set dt in Model
         self.head_loc = self.head_loc + distance * self.velocity
         self.joint_loc = self.joint_loc + distance * self.velocity
+        self.correct_wall_collision()
     
     def update_velocity(self):
         """Set velocity to be in the direction of vector from joint to head
@@ -326,6 +274,45 @@ class Larva(SimObject):
         # We have to clamp the cosine angle because of rounding errors (an issue when the two vectors point in the same direction)
         cos_theta = min(1.0, max(cos_theta, -1.0))
         return math.degrees(math.acos(cos_theta))
+
+    def correct_wall_collision(self):
+        head_x = self.head_loc[0]
+        head_y = self.head_loc[1]
+        origin_head_x = head_x - self.joint_loc[0]
+        origin_head_y = head_y - self.joint_loc[1]
+        arena = m.get_instance().get_arena()
+        head_update = None
+        # If out of bounds rotate the head to be aligned with the arena wall
+        if head_x <= arena.x_min or head_x >= arena.x_max:
+            if origin_head_y == 0:
+                # if the collision was "head on" (exactly perpendicular),
+                # redirect the head towards the side with more room, away from 
+                # other walls
+                wall_range = arena.y_max - arena.y_min
+                head_vert_dist = (head_y - arena.y_min) / wall_range
+                head_update = np.array([0, -1]) if head_vert_dist >= 0.5 else np.array([0, 1])
+            else:
+                head_update = np.array([0, 1]) if origin_head_y > 0 else np.array([0, -1])
+        elif head_y <= arena.y_min or head_y >= arena.y_max:
+            if origin_head_x == 0:
+                wall_range = arena.x_max - arena.x_min
+                head_horiz_dist = (head_x - arena.x_min) / wall_range
+                head_update = np.array([-1, 0]) if head_horiz_dist >= 0.5 else np.array([1, 0])
+            else:
+                head_update = np.array([1, 0]) if origin_head_x >= 0 else np.array([-1, 0])
+        else:
+            # Wasn't out of bounds
+            return
+        old_head_loc = self.head_loc
+        self.head_loc = self.joint_loc + head_update
+        if self.get_head_angle() > 90:
+            self.head_loc = old_head_loc
+            head_update = np.dot(-1, head_update)
+            self.head_loc = self.joint_loc + head_update
+        self.update_velocity()
+        # If it was casting, restart the cast
+        if not Larva.LarvaState.is_crawling(self.state):
+            self.state = Larva.LarvaState.CAST_START
 
     def larva_print(self, msg):
         if self.verbose:

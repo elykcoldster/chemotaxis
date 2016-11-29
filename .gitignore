@@ -4,8 +4,11 @@ __pycache__/
 # Visual Studio Code
 .vscode/
 
+# Txt files (commands)
+
 # Image files
 *.png
 *.jpg
 *.tiff
 *.bmp
+.ipynb_checkpoints/Larva_chemotaxis-checkpoint.ipynb
