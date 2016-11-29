@@ -1,10 +1,11 @@
 import random as rn
 import numpy as np
+from larva import Larva
 from model import Model as m
 from sim_object import SimObject
 
 
-class NewLarva(SimObject):
+class NewLarva(Larva):
 
     def p_run_term(self):
         lda = 1/(1+np.exp(-(self.g0+self.g1*self.y)))
@@ -114,7 +115,7 @@ class NewLarva(SimObject):
         self.history = []
         # init larva state (crawl forward)
         self.run_start_time = m.get_instance().time
-        self.state = NewLarva.LarvaState.CRAWL_FWD
+        self.state = Larva.LarvaState.CRAWL_FWD
         self.verbose = False
 		
         self.g0 = -0.8156
@@ -180,3 +181,6 @@ class NewLarva(SimObject):
         fcn(p_run_term, p_cast_term, p_wv, p_wv_cast_resume, rand)
 
         m.get_instance().notify_state(self.state, self.head_loc, self.joint_loc, self.velocity, self.get_head_angle())
+    def __str__(self):
+        return ('Location: ' + str(self.head_loc) + '\tVelocity: '
+                + str(self.velocity * self.v_fwd))

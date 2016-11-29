@@ -8,7 +8,7 @@ class PerceptionView(View):
         self.perception_history=[]
         
 
-    def update_view(self, time, state, head_loc, joint_loc, velocity, head_angle):
+    def update_view(self, time, state, head_loc, joint_loc, velocity, head_angle, source_position):
         """Save information about the larva
         """
         pass
