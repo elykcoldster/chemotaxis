@@ -43,7 +43,7 @@ class MoveStatsView(View):
         source_angle = self.getAngleWithXAxis(larva_to_source/np.linalg.norm(larva_to_source))
         
         #take difference
-        bearing = body_angle - source_angle
+        bearing = source_angle - body_angle
         
         #Difference is in range [-360, 360], so we bring it back to [-180, 180]
         if 360 >= bearing > 180:
