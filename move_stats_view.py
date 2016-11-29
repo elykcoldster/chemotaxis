@@ -15,11 +15,8 @@ class MoveStatsView(View):
         self.isTurn = []
         
         #parameters used for turn detection
-        self.currTurnLength = 0
-        self.currTurnDirection = 0
         self.time = 0
         self.TURN_REORIENTATION_SPEED = 12
-        self.MAX_TIME_FOR_TURN = 1
         
         #parameters used for run length histogram calculation
         self.runLengths = []
@@ -79,7 +76,7 @@ class MoveStatsView(View):
         
         #calculate body angle and bearing
         body_angle = self.calcBodyAngle(velocity)
-        bearing = self.calcBearing(velocity, head_loc, source_loc)
+        bearing = self. (velocity, head_loc, source_loc)
         if self.numTimeSteps == 0:
             #just starting off
             self.body_angles = [body_angle]
@@ -119,26 +116,14 @@ class MoveStatsView(View):
     
     def updateTurns(self, reorientation_speed, time, dt):
         #storing which direction the larva is turning
-        if abs(reorientation_speed) > self.TURN_REORIENTATION_SPEED:                    
-            self.currTurnLength += dt
-            print("This is an instantaneous turn, Time =", time)
+        turnDirection = 0
+        if abs(reorientation_speed) > self.TURN_REORIENTATION_SPEED:            
             if reorientation_speed > 0:
-                self.turnDirection = 1
+                turnDirection = 1
             else:
-                self.turnDirection = -1
-        else:
-            self.currTurnLength = 0
-            self.turnDirection = 0
+                turnDirection = -1
 
-        if self.currTurnLength > self.MAX_TIME_FOR_TURN:
-            self.isTurn.append(self.turnDirection)
-        elif self.currTurnLength == self.MAX_TIME_FOR_TURN:
-            print("This is a continous turn (turning for more than a second), Time =", time)
-            self.isTurn.append(0)
-            for i in range(len(self.isTurn)-self.currTurnLength/dt,len(self.isTurn)):
-                self.isTurn[i] = self.turnDirection
-        else:
-            self.isTurn.append(0)
+        self.isTurn.append(turnDirection)
 
     def draw(self):
         """Prints out the current view
