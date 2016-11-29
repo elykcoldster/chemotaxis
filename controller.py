@@ -1,8 +1,7 @@
 from collections import deque
 import numpy as np
 from model import Model as m
-from larva import Larva
-from new_larva import NewLarva
+from larva_factory import larva_factory
 from arena import Arena
 from disperse_arena import DisperseArena
 from view_factory import view_factory
@@ -13,7 +12,6 @@ class Controller:
     # TODO: modify the 'p' = 'print_larva' function to be a command that
     # prints descriptions of ALL simulation objects.
     command_fcns = {'a': 'add_larva',
-                    'an': 'add_new_larva',
                     'ar': 'add_arena',
                     'ad': 'add_disperse_arena',
                     'v': 'toggle_verbosity',
@@ -64,23 +62,18 @@ class Controller:
 
     def add_larva(self, args):
         """Add a larva with specified characteristics
+        
+        Example:
+            'a NewLarva 1 1 1 1'
+            or
+            'a OriginalLarva 1 1 1 1'
         """
+        larva_type = args.popleft()
         loc_x = float(args.popleft())
         loc_y = float(args.popleft())
         vel_x = float(args.popleft())
         vel_y = float(args.popleft())
-        new_larva = Larva(np.array([loc_x, loc_y]), np.array([vel_x, vel_y]))
-        m.get_instance().add_larva(new_larva)
-        print('Added a larva: ' + str(new_larva))
-
-    def add_new_larva(self, args):
-        """Add a larva with specified characteristics
-        """
-        loc_x = float(args.popleft())
-        loc_y = float(args.popleft())
-        vel_x = float(args.popleft())
-        vel_y = float(args.popleft())
-        new_larva = NewLarva(np.array([loc_x, loc_y]), np.array([vel_x, vel_y]))
+        new_larva = larva_factory(larva_type, np.array([loc_x, loc_y]), np.array([vel_x, vel_y]))
         m.get_instance().add_larva(new_larva)
         print('Added a larva: ' + str(new_larva))
 
