@@ -1,0 +1,10 @@
+an 1 1 -1 1
+ar 0 0 5e2 10
+av ArenaView
+av PerceptionView
+av StatsView
+r 5000
+d ArenaView
+d PerceptionView
+d StatsView
+q

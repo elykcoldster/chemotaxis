@@ -2,12 +2,15 @@ import numpy as np
 from view import View
 from model import Model as m
 from larva import Larva
-LarvaState = Larva.LarvaState
+
+LarvaState = None
 
 class StatsView(View):
     def __init__(self):
         self.clear()
         self.prev_state = None
+        global LarvaState
+        LarvaState = m.get_instance().larvae[0].LarvaState
 
     def update_view(self, time, state, head_loc, joint_loc, velocity, head_angle, source_position):
         # If view just created, and has no previous state, don't calculate
