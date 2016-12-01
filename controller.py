@@ -7,6 +7,49 @@ from disperse_arena import DisperseArena
 from view_factory import view_factory
 from util import Error
 
+commands_help_text = """Commands:
+a <type> <pos_x> <pos_y> <vel_x> <vel_y>
+    Adds a larva with initial position (pos_x, pos_y) and initial crawl
+    velocity (vel_x, vel_y).
+    Example: a OriginalLarva 2 3 1 1
+
+ar <type> <pos_x> <pos_y> <strength> <sigma>
+    Creates an arena with a dispersing source at position (pos_x, pos_y) and
+    an initial source strength and intial standard deviation of sigma.
+    Example: ar ArenaView 0 0 10 5
+
+v
+    Toggles verbosity.
+
+r [<n_steps>]
+    Runs the simulation for n_steps number of iterations. If n_steps is not
+    given the simulation will run for a single time step.
+    Example: r 100
+
+p
+    Prints out the current location and velocity vector of the larva.
+
+av <view_type>
+    Attaches a view to the controller. Valid options for view_type are:
+        ArenaView
+        TableView
+        StatsView
+        MovementStatsView
+        PerceptionView
+    Example: av ArenaView
+
+d <view_type|all>
+    Draws the specified view. If 'all' is given instead of a view_type, all
+    attached views will be drawn.
+    Example: d ArenaView
+
+e <view_type> <output_path>
+    Export the specified view_type to the location given by output_path. The
+    default format for images is .png while the default format for text is
+    .txt.
+    Example: e TableView tableAsFile.txt
+"""
+
 class Controller:
     # Function dispatch table:
     # TODO: modify the 'p' = 'print_larva' function to be a command that
@@ -42,12 +85,15 @@ class Controller:
                 else:
                     input_str = input('Time: {0:.1f}, Enter command: '.format(m.get_instance().time))
                 inputs = deque(input_str.split())
-                cmd = ''
+                cmd = 'h'
                 if len(inputs):
                     cmd = inputs.popleft()
                 if cmd == 'q':
                     print('Quiting')
                     return
+                if cmd == 'h':
+                    print(commands_help_text)
+                    continue
                 fcn_name = self.command_fcns.get(cmd)
                 if not fcn_name:
                     raise Error('Invalid input!')
