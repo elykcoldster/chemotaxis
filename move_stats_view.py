@@ -128,31 +128,51 @@ class MoveStatsView(View):
     def draw(self):
         """Prints out the current view
         """
-        plt.figure()
-        #scatter plot of bearing versus reorientation speed
-        plt.subplot(221)
-        plt.scatter(self.bearings, self.reorientation_speeds)
-        plt.title('Reorientation speed vs Bearing')
-        plt.xlabel('Bearing')
-        plt.ylabel('Reorientation speed')  
         
-        plt.subplot(222)
+        plt.figure()
+
+        
+        absoluteBearingFreqs = []
+        for i in range(len(self.bearings)):
+            absoluteBearing = np.absolute(self.bearings[i])
+            if not self.isTurn[i]==0:
+                absoluteBearingFreqs.append(absoluteBearing)
+        
+        plt.subplot(221)
+        #plot of turn probability versus absolute bearing
+        plt.hist(absoluteBearingFreqs, bins = 8, normed=True)
+        plt.title('Turn probability vs Absolute Bearing')
+        plt.xlabel('Absolute Bearing')
+        plt.ylabel('Turn Probability')
+        
         bearingFreqs = []
         for i in range(len(self.bearings)):
             bearing = self.bearings[i]
             if self.isTurn[i]==1:
                 bearingFreqs.append(bearing)
-        
+        plt.subplot(222)
+        #plot of left turn probability versus true bearing
         plt.hist(bearingFreqs, bins = 12, normed=True)
         plt.title('Probability Left Turn vs Bearing')
         plt.xlabel('Bearing')
         plt.ylabel('Left turn frequency')
         
+
         plt.subplot(223)
+        #scatter plot of bearing versus reorientation speed        
+        plt.scatter(self.bearings, self.reorientation_speeds)
+        plt.title('Reorientation speed vs Bearing')
+        plt.xlabel('Bearing')
+        plt.ylabel('Reorientation speed')  
+
+        
+        plt.subplot(224)
+        #histogram of run lengths           
         plt.hist(self.runLengths, bins = 5)
         plt.title('Run Length Histogram')
         plt.xlabel('Run lengths (s)')
-        plt.ylabel('Proportion of runs')
+        plt.ylabel('Proportion of runs') 
+                  
         plt.tight_layout()
         plt.show()
 
