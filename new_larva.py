@@ -170,7 +170,7 @@ class NewLarva(Larva):
         p_wv = self.p_wv()
         p_wv_cast_resume = self.p_wv_cast_resume()
 
-        #print(p_cast_term)
+        #print(m.get_instance().get_arena().base_concentration())
 
         self.history.append(self.perceive())
 

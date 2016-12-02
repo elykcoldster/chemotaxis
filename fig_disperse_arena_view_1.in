@@ -1,10 +1,10 @@
 a NewLarva 1 1 -1 1
-ar 0 0 5e2 10
+ad 0 0 5e2 10
 av ArenaView
 av PerceptionView
 av StatsView
 r 5000
-e ArenaView fig_arena_1
+e ArenaView fig_disperse_arena_1
 d ArenaView
 d PerceptionView
 d StatsView
