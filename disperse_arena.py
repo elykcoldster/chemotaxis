@@ -3,7 +3,7 @@ from model import Model as m
 from sim_object import SimObject
 
 class DisperseArena(SimObject):
-    def __init__(self, x_min=-33, x_max=33, y_min=-50, y_max=50, source_position=np.array([0,0]), source_strength=10, sigma=1, sigma_growth_rate=1e-2, sigma_bound=25):
+    def __init__(self, x_min=-33, x_max=33, y_min=-50, y_max=50, source_position=np.array([0,0]), source_strength=10, sigma=1, sigma_growth_rate=1e-2, sigma_bound_mult=2.5):
         self.x_min = x_min
         self.x_max = x_max
         self.y_min = y_min
@@ -13,7 +13,7 @@ class DisperseArena(SimObject):
         self.base_source_strength = source_strength
         self.base_sigma = sigma
         self.sigma = sigma
-        self.sigma_bound = sigma_bound
+        self.sigma_bound = sigma * sigma_bound_mult
         self.sigma_growth_rate = sigma_growth_rate
 
     def update(self):
