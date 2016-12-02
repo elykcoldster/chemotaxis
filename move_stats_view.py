@@ -107,7 +107,7 @@ class MoveStatsView(View):
         self.numTimeSteps+=1
     
     def updateRunStats(self, state, dt):
-        if state in [Larva.LarvaState.CRAWL_FWD, Larva.LarvaState.WV_CRAWL_FWD, Larva.LarvaState.WV_CRAWL_FWD_WHILE_CAST]:
+        if Larva.LarvaState.is_crawling(state):
             self.currRunLength += dt
         else:
             if self.currRunLength > 0:
@@ -145,6 +145,8 @@ class MoveStatsView(View):
         plt.xlabel('Absolute Bearing')
         plt.ylabel('Turn Probability')
         
+        np.savetxt('absolute_bearing_freqs_turn.txt', absoluteBearingFreqs)
+        
         bearingFreqs = []
         for i in range(len(self.bearings)):
             bearing = self.bearings[i]
@@ -156,14 +158,17 @@ class MoveStatsView(View):
         plt.title('Probability Left Turn vs Bearing')
         plt.xlabel('Bearing')
         plt.ylabel('Left turn frequency')
-        
+        np.savetxt('bearing_freqs_left_turn.txt', bearingFreqs)
 
         plt.subplot(223)
         #scatter plot of bearing versus reorientation speed        
         plt.scatter(self.bearings, self.reorientation_speeds)
         plt.title('Reorientation speed vs Bearing')
         plt.xlabel('Bearing')
-        plt.ylabel('Reorientation speed')  
+        plt.ylabel('Reorientation speed')
+        np.savetxt('reorientation_speed_and_bearing.txt', \
+                   np.column_stack((self.bearings, self.reorientation_speeds)), \
+                   header = "Bearings,Reorientation_Speeds", delimiter = ",")
 
         
         plt.subplot(224)
@@ -172,7 +177,7 @@ class MoveStatsView(View):
         plt.title('Run Length Histogram')
         plt.xlabel('Run lengths (s)')
         plt.ylabel('Proportion of runs') 
-                  
+        np.savetxt('run_lengths.txt', self.runLengths)          
         plt.tight_layout()
         plt.show()
 
