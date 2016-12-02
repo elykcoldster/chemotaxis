@@ -13,10 +13,15 @@ a <type> <pos_x> <pos_y> <vel_x> <vel_y>
     velocity (vel_x, vel_y).
     Example: a OriginalLarva 2 3 1 1
 
-ar <type> <pos_x> <pos_y> <strength> <sigma>
+ar <pos_x> <pos_y> <strength> <sigma>
+    Creates an arena with a non-dispersing source at position (pos_x, pos_y)
+    and an source strength and standard deviation of sigma.
+    Example: ar 0 0 10 5
+
+ad <pos_x> <pos_y> <strength> <sigma>
     Creates an arena with a dispersing source at position (pos_x, pos_y) and
     an initial source strength and intial standard deviation of sigma.
-    Example: ar ArenaView 0 0 10 5
+    Example: ad 0 0 10 5
 
 v
     Toggles verbosity.
