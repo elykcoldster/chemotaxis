@@ -4,7 +4,7 @@ Paper with the original model that we are extending: [A Model of Drosophila Larv
 Paper with the extensions (detailed concentration detection mechanisms): [Dynamical feature extraction at the sensory periphery guides chemotaxis](https://elifesciences.org/content/4/e06694)  
 
 # Setting Up 
-The simulation is written for Python 3. It depends on multiple packages. To easily install the packages, we recommend that you use either [Anaconda for Python 3](https://www.continuum.io/downloads) or [pip](https://pip.pypa.io/en/stable/installing/). If you choose to use pip, we highly recommend you use [virtualenv](https://virtualenv.pypa.io/en/stable/installation/) for a clean installation.
+The simulation is written for Python 3. It depends on multiple packages. To easily install the packages, we recommend that you use either [Anaconda for Python 3](https://www.continuum.io/downloads) or [pip](https://pip.pypa.io/en/stable/installing/). If you choose to use pip, we highly recommend you use [virtualenv](https://virtualenv.pypa.io/en/stable/installation/) for clean package installations.
 
 The first step is to clone the repository:
 ```
