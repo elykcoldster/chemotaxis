@@ -54,6 +54,7 @@ class MoveStatsView(View):
     
     def calcReorientationSpeed(self, body_angles, dt):
         total_reorientation = 0;
+        #print(dt)
         num_samples = int(1/dt);
         for i in range(len(body_angles) - num_samples, len(body_angles)):
             if i < 1:
@@ -107,7 +108,7 @@ class MoveStatsView(View):
         self.numTimeSteps+=1
     
     def updateRunStats(self, state, dt):
-        if state in [Larva.LarvaState.CRAWL_FWD, Larva.LarvaState.WV_CRAWL_FWD, Larva.LarvaState.WV_CRAWL_FWD_WHILE_CAST]:
+        if Larva.LarvaState.is_crawling(state):
             self.currRunLength += dt
         else:
             if self.currRunLength > 0:
@@ -128,31 +129,67 @@ class MoveStatsView(View):
     def draw(self):
         """Prints out the current view
         """
-        plt.figure()
-        #scatter plot of bearing versus reorientation speed
-        plt.subplot(221)
-        plt.scatter(self.bearings, self.reorientation_speeds)
-        plt.title('Reorientation speed vs Bearing')
-        plt.xlabel('Bearing')
-        plt.ylabel('Reorientation speed')  
         
-        plt.subplot(222)
+        plt.figure()
+
+        
+        absoluteBearingFreqs = []
+        for i in range(len(self.bearings)):
+            absoluteBearing = np.absolute(self.bearings[i])
+            if not self.isTurn[i]==0:
+                absoluteBearingFreqs.append(absoluteBearing)
+        
+        plt.subplot(221)
+        #plot of turn probability versus absolute bearing
+        plt.hist(absoluteBearingFreqs, bins = 8, normed=True)
+        plt.title('Turn probability vs Absolute Bearing')
+        plt.xlabel('Absolute Bearing')
+        plt.ylabel('Turn Probability')
+        
+        #np.savetxt('stats_dump/absolute_bearing_freqs_turn.txt', absoluteBearingFreqs)
+        
         bearingFreqs = []
         for i in range(len(self.bearings)):
             bearing = self.bearings[i]
             if self.isTurn[i]==1:
                 bearingFreqs.append(bearing)
-        
+        plt.subplot(222)
+        #plot of left turn probability versus true bearing
         plt.hist(bearingFreqs, bins = 12, normed=True)
         plt.title('Probability Left Turn vs Bearing')
         plt.xlabel('Bearing')
         plt.ylabel('Left turn frequency')
-        
+        #np.savetxt('stats_dump/bearing_freqs_left_turn.txt', bearingFreqs)
+
         plt.subplot(223)
+        #scatter plot of bearing versus reorientation speed
+        
+        #filter out turns with less than 12 degrees/s
+        #filteredBearings = []
+        #filteredReorientations = []
+        #for i in range(len(self.bearings)):
+            #if (not self.reorientation_speeds[i]==0) and abs(self.reorientation_speeds[i]) > 12:
+                #filteredBearings.append(self.bearings[i])
+                #filteredReorientations.append(self.reorientation_speeds[i])
+        #plt.scatter(filteredBearings, filteredReorientations)
+        
+        plt.scatter(self.bearings, self.reorientation_speeds)
+        plt.title('Reorientation speed vs Bearing')
+        plt.xlabel('Bearing')
+        plt.ylabel('Reorientation speed')
+        
+        #np.savetxt('stats_dump/reorientation_speed_and_bearing.txt', \
+                   #np.column_stack((filteredBearings, filteredReorientations)), \
+                   #header = "Bearings,Reorientation_Speeds", delimiter = ",")
+
+        
+        plt.subplot(224)
+        #histogram of run lengths           
         plt.hist(self.runLengths, bins = 5)
         plt.title('Run Length Histogram')
         plt.xlabel('Run lengths (s)')
-        plt.ylabel('Proportion of runs')
+        plt.ylabel('Proportion of runs') 
+        #np.savetxt('stats_dump/run_lengths.txt', self.runLengths)          
         plt.tight_layout()
         plt.show()
 

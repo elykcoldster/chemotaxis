@@ -1,6 +1,9 @@
+#for debugging
 #import pdb
+#import random as rn
+
+
 import sys
-import random as rn
 from controller import Controller
 
 
@@ -15,6 +18,8 @@ def main():
     controller.run(input_file)
 
 if __name__ == "__main__":
-    #pdb.set_trace()
-    rn.seed(1234)
+    #for debugging
+    # pdb.set_trace()
+    # rn.seed(1234)
+
     main()
