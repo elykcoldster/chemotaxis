@@ -20,23 +20,27 @@ class PerceptionView(View):
         self.perception_history = m.get_instance().larvae[0].history
         t = np.arange(0,len(self.perception_history)*dt,dt)
         plt.plot(t,self.perception_history)
+        plt.title('Perception History')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Perception (uM)')
         plt.show()
 
     def clear(self):
         """Discard the saved information - empty view
         """
-        self.head_locs = []
-        self.joint_locs = []
+        self.perception_history = []
 
     def export(self, path):
         """Write out the view to file
         """
         # Save plot as png
-        plt.plot(self.head_locs[:,0],self.head_locs[:,1],'b',linewidth=3)
-        plt.plot(self.joint_locs[:,0],self.joint_locs[:,1],'r',linewidth=2)
-        plt.title('Larva Trajectory')
-        plt.xlabel('x position')
-        plt.ylabel('y position')
+        dt = m.get_instance().dt
+        self.perception_history = m.get_instance().larvae[0].history
+        t = np.arange(0,len(self.perception_history)*dt,dt)
+        plt.plot(t,self.perception_history)
+        plt.title('Perception History')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Perception (uM)')
 
         plt.gca().set_aspect('equal', adjustable='box')
         plt.savefig(path + '.png')
