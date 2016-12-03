@@ -39,7 +39,7 @@ python main.py
 ```
 This will begin the interactive simulator, where you can give it commands. To view a list of commands and how to use them, use the "h" command.
 
-Over the course of your experiments, you may find it cumbersome to type the same commands over and over again. Thus, you can place those same commands that you would normally type interactively into a a file such as "experiment.in", with each command on a separate line, and run the simulator like so:
+Over the course of your experiments, you may find it cumbersome to type the same commands over and over again. Thus, you can place those same commands that you would normally type interactively into a file such as "experiment.in", with each command on a separate line, and run the simulator like so:
 ```
 python main.py -f experiment.in
 ```
