@@ -1,6 +1,7 @@
-a 20 30 -1 1.5
+a NewLarva 20 30 -1 1.5
 ar 30 40 10 5
 av ArenaView
 r 70
 r 216
 d all
+q

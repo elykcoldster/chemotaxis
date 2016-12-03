@@ -36,7 +36,7 @@ class ArenaView(View):
         im = xgrid * 0;
         for i in range(0, int(nx)):
             for j in range(0, int(ny)):
-                im[i][j] = m.get_instance().get_arena().concentration_at_loc(np.array([xgrid[i][i], ygrid[j][j]]))
+                im[i][int(ny) - 1 - j] = m.get_instance().get_arena().concentration_at_loc(np.array([xgrid[i][i], ygrid[j][j]]))
         plt.imshow(im.T, cmap=cmap, vmin=0, vmax=m.get_instance().get_arena().base_concentration() ,extent=[xmin, xmax, ymin, ymax])
         plt.plot(self.head_locs[:,0],self.head_locs[:,1],'b',linewidth=3)
         plt.plot(self.joint_locs[:,0],self.joint_locs[:,1],'r',linewidth=2)

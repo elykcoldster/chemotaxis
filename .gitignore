@@ -6,6 +6,12 @@ __pycache__/
 
 # Txt files (commands)
 
+# Archive files
+*.zip
+*.tar
+*.gz
+*.rar
+
 # Image files
 *.png
 *.jpg
