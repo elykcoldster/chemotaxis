@@ -54,6 +54,7 @@ class MoveStatsView(View):
     
     def calcReorientationSpeed(self, body_angles, dt):
         total_reorientation = 0;
+        #print(dt)
         num_samples = int(1/dt);
         for i in range(len(body_angles) - num_samples, len(body_angles)):
             if i < 1:
@@ -145,7 +146,7 @@ class MoveStatsView(View):
         plt.xlabel('Absolute Bearing')
         plt.ylabel('Turn Probability')
         
-        np.savetxt('absolute_bearing_freqs_turn.txt', absoluteBearingFreqs)
+        #np.savetxt('stats_dump/absolute_bearing_freqs_turn.txt', absoluteBearingFreqs)
         
         bearingFreqs = []
         for i in range(len(self.bearings)):
@@ -158,17 +159,28 @@ class MoveStatsView(View):
         plt.title('Probability Left Turn vs Bearing')
         plt.xlabel('Bearing')
         plt.ylabel('Left turn frequency')
-        np.savetxt('bearing_freqs_left_turn.txt', bearingFreqs)
+        #np.savetxt('stats_dump/bearing_freqs_left_turn.txt', bearingFreqs)
 
         plt.subplot(223)
-        #scatter plot of bearing versus reorientation speed        
+        #scatter plot of bearing versus reorientation speed
+        
+        #filter out turns with less than 12 degrees/s
+        #filteredBearings = []
+        #filteredReorientations = []
+        #for i in range(len(self.bearings)):
+            #if (not self.reorientation_speeds[i]==0) and abs(self.reorientation_speeds[i]) > 12:
+                #filteredBearings.append(self.bearings[i])
+                #filteredReorientations.append(self.reorientation_speeds[i])
+        #plt.scatter(filteredBearings, filteredReorientations)
+        
         plt.scatter(self.bearings, self.reorientation_speeds)
         plt.title('Reorientation speed vs Bearing')
         plt.xlabel('Bearing')
         plt.ylabel('Reorientation speed')
-        np.savetxt('reorientation_speed_and_bearing.txt', \
-                   np.column_stack((self.bearings, self.reorientation_speeds)), \
-                   header = "Bearings,Reorientation_Speeds", delimiter = ",")
+        
+        #np.savetxt('stats_dump/reorientation_speed_and_bearing.txt', \
+                   #np.column_stack((filteredBearings, filteredReorientations)), \
+                   #header = "Bearings,Reorientation_Speeds", delimiter = ",")
 
         
         plt.subplot(224)
@@ -177,7 +189,7 @@ class MoveStatsView(View):
         plt.title('Run Length Histogram')
         plt.xlabel('Run lengths (s)')
         plt.ylabel('Proportion of runs') 
-        np.savetxt('run_lengths.txt', self.runLengths)          
+        #np.savetxt('stats_dump/run_lengths.txt', self.runLengths)          
         plt.tight_layout()
         plt.show()
 

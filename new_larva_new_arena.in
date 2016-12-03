@@ -1,0 +1,6 @@
+a NewLarva 1 1 -1 1
+ad 0 0 5e2 10
+av ArenaView
+av MoveStatsView
+r 5000
+d all
